@@ -20,18 +20,21 @@ public class Doctor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false, length = 10)
     private String crm;
 
+    @Column(nullable = false, length = 2)
     private String uf;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "doctor", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
-    private Consultation consultation;
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.MERGE)
+    private List<Consultation> consultations;
 
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinTable(
