@@ -41,7 +41,7 @@ public class Consultation {
     private Integer duration;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private ConsultationStatus status;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

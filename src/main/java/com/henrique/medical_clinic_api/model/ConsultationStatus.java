@@ -1,6 +1,6 @@
 package com.henrique.medical_clinic_api.model;
 
-public enum Status {
+public enum ConsultationStatus {
     SCHEDULED("scheduled"),
     CONFIRMED("confirmed"),
     ON_HOLD("on hold"),
@@ -9,7 +9,7 @@ public enum Status {
     CANCELED("canceled");
 
     private final String name;
-    Status(String name) {
+    ConsultationStatus(String name) {
         this.name = name;
     }
 }
