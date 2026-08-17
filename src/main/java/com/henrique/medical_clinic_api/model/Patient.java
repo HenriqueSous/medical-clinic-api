@@ -26,8 +26,10 @@ public class Patient {
     @Column(nullable = false, unique = true, length = 11)
     private String cpf;
 
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.MERGE)

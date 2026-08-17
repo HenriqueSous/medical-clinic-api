@@ -29,8 +29,10 @@ public class Doctor {
     @Column(nullable = false, length = 2)
     private String uf;
 
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.MERGE)

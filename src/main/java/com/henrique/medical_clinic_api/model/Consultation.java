@@ -1,6 +1,7 @@
 package com.henrique.medical_clinic_api.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,14 +30,22 @@ public class Consultation {
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
 
+    @Column(nullable = false)
     private LocalDate consultationDate;
 
+    @Column(nullable = false)
     private LocalTime consultationTime;
+
+    @Column(nullable = false)
+    @Min(10)
+    private Integer duration;
 
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 }
