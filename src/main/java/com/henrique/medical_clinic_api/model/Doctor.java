@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -36,7 +37,7 @@ public class Doctor {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.MERGE)
-    private List<Consultation> consultations;
+    private List<Consultation> consultations = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinTable(
@@ -44,5 +45,5 @@ public class Doctor {
             joinColumns = @JoinColumn(name = "doctor_id"),
             inverseJoinColumns = @JoinColumn(name = "specialty_id")
     )
-    private List<Specialty> specialties;
+    private List<Specialty> specialties = new ArrayList<>();
 }

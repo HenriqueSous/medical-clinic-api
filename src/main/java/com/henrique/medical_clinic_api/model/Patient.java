@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,5 +36,5 @@ public class Patient {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.MERGE)
-    private List<Consultation> consultations;
+    private List<Consultation> consultations = new ArrayList<>();
 }

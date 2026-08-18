@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,5 +27,5 @@ public class Specialty {
     private String description;
 
     @ManyToMany(mappedBy = "specialties")
-    private List<Doctor> doctors;
+    private List<Doctor> doctors = new ArrayList<>();
 }
