@@ -21,8 +21,13 @@ public class PatientController {
     private final PatientMapper patientMapper = PatientMapper.INSTANCE;
 
     @GetMapping
-    private ResponseEntity<List<PatientResponseDTO>> get() {
-        List<PatientResponseDTO> response = patientMapper.toResponseList(patientService.findAll());
+    private ResponseEntity<List<PatientResponseDTO>> get(@RequestParam(name = "cpf", required = false) String cpf) {
+        List<PatientResponseDTO> response;
+        if (cpf == null) {
+            response = patientMapper.toResponseList(patientService.findAll());
+        } else {
+            response = patientMapper.toResponseList(patientService.findByCpf(cpf));
+        }
         return ResponseEntity.ok(response);
     }
 
