@@ -1,5 +1,6 @@
 package com.henrique.medical_clinic_api.service;
 
+import com.henrique.medical_clinic_api.exception.PatientNotFoundException;
 import com.henrique.medical_clinic_api.model.Patient;
 import com.henrique.medical_clinic_api.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,10 @@ public class PatientService {
 
     public List<Patient> findAll() {
         return patientRepository.findAll();
+    }
+
+    public Patient findById(long id) {
+        return patientRepository.findById(id).orElseThrow(() -> new PatientNotFoundException(id));
     }
 
     public Patient savePatient(Patient patient) {

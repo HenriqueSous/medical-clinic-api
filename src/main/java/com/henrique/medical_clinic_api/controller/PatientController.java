@@ -22,8 +22,14 @@ public class PatientController {
 
     @GetMapping
     private ResponseEntity<List<PatientResponseDTO>> get() {
-        List<PatientResponseDTO> result = patientMapper.toResponseList(patientService.findAll());
-        return ResponseEntity.ok(result);
+        List<PatientResponseDTO> response = patientMapper.toResponseList(patientService.findAll());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    private ResponseEntity<PatientResponseDTO> getById(@PathVariable long id) {
+        PatientResponseDTO response = patientMapper.toResponse(patientService.findById(id));
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
