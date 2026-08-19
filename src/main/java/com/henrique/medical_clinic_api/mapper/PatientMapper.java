@@ -6,6 +6,8 @@ import com.henrique.medical_clinic_api.model.Patient;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper
 public interface PatientMapper {
     PatientMapper INSTANCE = Mappers.getMapper(PatientMapper.class);
@@ -13,4 +15,6 @@ public interface PatientMapper {
     Patient toEntity(PatientRequestDTO patientRequestDTO);
 
     PatientResponseDTO toResponse(Patient patient);
+
+    List<PatientResponseDTO> toResponseList(List<Patient> patients);
 }
