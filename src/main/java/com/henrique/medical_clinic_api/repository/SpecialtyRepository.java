@@ -8,7 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface SpecialtyRepository extends JpaRepository<Specialty, Long> {
-    Optional<Specialty> findById(Long id);
-
     Specialty findByNameIgnoreCase(String name);
 }
