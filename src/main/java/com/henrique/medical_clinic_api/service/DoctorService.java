@@ -27,6 +27,10 @@ public class DoctorService {
         return doctorRepository.findById(id).orElseThrow(() -> new DoctorNotFoundException(id));
     }
 
+    public List<Doctor> findByOptionalFilters(String name, String crm, String uf) {
+        return doctorRepository.findByOptionalFilters(name, crm, uf);
+    }
+
     @Transactional
     public Doctor save(Doctor doctor) {
         List<Specialty> specialtiesToBeSaved = new ArrayList<>();

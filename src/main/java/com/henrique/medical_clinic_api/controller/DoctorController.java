@@ -21,8 +21,15 @@ public class DoctorController {
     private final DoctorMapper doctorMapper = DoctorMapper.INSTANCE;
 
     @GetMapping
-    private ResponseEntity<List<DoctorResponseDTO>> get() {
-        return ResponseEntity.ok(doctorMapper.toResponseList(doctorService.findAll()));
+    private ResponseEntity<List<DoctorResponseDTO>> get(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String crm,
+            @RequestParam(required = false) String uf
+    ) {
+        if (name == null && crm == null && uf == null) {
+            return ResponseEntity.ok(doctorMapper.toResponseList(doctorService.findAll()));
+        }
+        return ResponseEntity.ok(doctorMapper.toResponseList(doctorService.findByOptionalFilters(name, crm, uf)));
     }
 
     @GetMapping("/{id}")
