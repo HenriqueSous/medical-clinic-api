@@ -1,5 +1,6 @@
 package com.henrique.medical_clinic_api.service;
 
+import com.henrique.medical_clinic_api.exception.SpecialtyNotFoundException;
 import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.repository.SpecialtyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,10 @@ public class SpecialtyService {
 
     public List<Specialty> findAll() {
         return specialtyRepository.findAll();
+    }
+
+    public Specialty findById(long id) {
+        return specialtyRepository.findById(id).orElseThrow(() -> new SpecialtyNotFoundException(id));
     }
 
     public Specialty save(Specialty specialty) {
