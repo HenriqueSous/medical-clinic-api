@@ -10,9 +10,11 @@ import java.util.List;
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Long> {
 
-    @Query("SELECT p FROM Patient p " +
-            "WHERE (:name IS NULL OR p.name LIKE CONCAT(:name, '%'))" +
-            " AND " +
-            " (:cpf IS NULL OR p.cpf LIKE CONCAT(:cpf, '%'))")
+    @Query(
+            "SELECT p FROM Patient p " +
+                    "WHERE (:name IS NULL OR p.name LIKE CONCAT(:name, '%'))" +
+                    " AND " +
+                    "(:cpf IS NULL OR p.cpf LIKE CONCAT(:cpf, '%'))"
+    )
     List<Patient> findByOptionalFilters(String name, String cpf);
 }
