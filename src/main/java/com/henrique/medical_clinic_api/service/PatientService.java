@@ -21,8 +21,8 @@ public class PatientService {
         return patientRepository.findById(id).orElseThrow(() -> new PatientNotFoundException(id));
     }
 
-    public List<Patient> findByCpf(String cpf) {
-        return patientRepository.findByCpfStartingWith(cpf);
+    public List<Patient> findByOptionalFilters(String name, String cpf) {
+        return patientRepository.findByOptionalFilters(name, cpf);
     }
 
     public Patient savePatient(Patient patient) {
