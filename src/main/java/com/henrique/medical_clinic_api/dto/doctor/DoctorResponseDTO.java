@@ -1,8 +1,7 @@
 package com.henrique.medical_clinic_api.dto.doctor;
 
 import com.henrique.medical_clinic_api.dto.consultation.ConsultationResponseDTO;
-import com.henrique.medical_clinic_api.dto.specialty.SpecialtyResponseDTO;
-import com.henrique.medical_clinic_api.model.Consultation;
+import com.henrique.medical_clinic_api.dto.specialty.SpecialtySummaryDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,7 +12,7 @@ public record DoctorResponseDTO(
         String crm,
         String uf,
         List<ConsultationResponseDTO> consultations,
-        List<SpecialtyResponseDTO> specialties,
+        List<SpecialtySummaryDTO> specialties,
         LocalDateTime updatedAt,
         LocalDateTime createdAt
 ) {
