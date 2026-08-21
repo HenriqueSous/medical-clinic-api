@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public record ConsultationResponseDTO(
-        Integer id,
+        Long id,
         DoctorConsultationResponseDTO doctor,
         PatientConsultationResponseDTO patient,
         LocalDate consultationDate,
