@@ -1,7 +1,7 @@
 package com.henrique.medical_clinic_api.dto.patient;
 
 public record PatientSummaryDTO(
-        Integer id,
+        Long id,
         String name,
         String cpf
 ){
