@@ -8,13 +8,15 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface PatientMapper {
     PatientMapper INSTANCE = Mappers.getMapper(PatientMapper.class);
 
     Patient toEntity(PatientRequestDTO patientRequestDTO);
 
     PatientResponseDTO toResponse(Patient patient);
+
+    List<Patient> toEntityList(List<PatientRequestDTO> patientRequestDTOList);
 
     List<PatientResponseDTO> toResponseList(List<Patient> patients);
 }

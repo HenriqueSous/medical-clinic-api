@@ -6,11 +6,17 @@ import com.henrique.medical_clinic_api.model.Doctor;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+import java.util.List;
+
+@Mapper(componentModel = "spring", uses = SpecialtyMapper.class)
 public interface DoctorMapper {
     DoctorMapper INSTANCE = Mappers.getMapper(DoctorMapper.class);
 
     Doctor toEntity(DoctorRequestDTO doctorRequestDTO);
 
     DoctorResponseDTO toResponse(Doctor doctor);
+
+    List<Doctor> toEntityList(List<DoctorRequestDTO> doctorRequestDTOList);
+
+    List<DoctorResponseDTO> toResponseList(List<Doctor> doctors);
 }
