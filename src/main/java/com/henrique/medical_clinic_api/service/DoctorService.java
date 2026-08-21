@@ -18,6 +18,10 @@ public class DoctorService {
     @Autowired
     private SpecialtyService specialtyService;
 
+    public List<Doctor> findAll() {
+        return doctorRepository.findAll();
+    }
+
     @Transactional
     public Doctor save(Doctor doctor) {
         List<Specialty> specialtiesToBeSaved = new ArrayList<>();
