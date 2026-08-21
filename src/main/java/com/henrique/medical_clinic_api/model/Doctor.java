@@ -43,7 +43,7 @@ public class Doctor {
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.MERGE)
     private List<Consultation> consultations = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.PERSIST})
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
             name = "doctor_specialty",
             joinColumns = @JoinColumn(name = "doctor_id"),
