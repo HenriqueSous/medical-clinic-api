@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tools.jackson.databind.JsonNode;
 
 import java.util.List;
 
@@ -46,6 +47,12 @@ public class PatientController {
         PatientResponseDTO patientSaved = patientMapper.toResponse(patientService.savePatient(patient));
 
         return new ResponseEntity<>(patientSaved, HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/{id}")
+    private ResponseEntity<PatientResponseDTO> patch(@PathVariable long id, @RequestBody JsonNode jsonNode) {
+        Patient patient = patientService.updateByParts(id, jsonNode);
+        return ResponseEntity.ok(patientMapper.toResponse(patient));
     }
 
     @DeleteMapping("/{id}")
