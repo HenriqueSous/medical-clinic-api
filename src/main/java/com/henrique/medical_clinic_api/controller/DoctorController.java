@@ -25,6 +25,11 @@ public class DoctorController {
         return ResponseEntity.ok(doctorMapper.toResponseList(doctorService.findAll()));
     }
 
+    @GetMapping("/{id}")
+    private ResponseEntity<DoctorResponseDTO> getById(@PathVariable long id) {
+        return ResponseEntity.ok(doctorMapper.toResponse(doctorService.findById(id)));
+    }
+
     @PostMapping
     private ResponseEntity<DoctorResponseDTO> post(@RequestBody DoctorRequestDTO doctorRequestDTO) {
         Doctor doctor = doctorMapper.toEntity(doctorRequestDTO);

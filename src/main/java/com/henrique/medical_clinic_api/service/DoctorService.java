@@ -1,5 +1,6 @@
 package com.henrique.medical_clinic_api.service;
 
+import com.henrique.medical_clinic_api.exception.DoctorNotFoundException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.repository.DoctorRepository;
@@ -20,6 +21,10 @@ public class DoctorService {
 
     public List<Doctor> findAll() {
         return doctorRepository.findAll();
+    }
+
+    public Doctor findById(long id) {
+        return doctorRepository.findById(id).orElseThrow(() -> new DoctorNotFoundException(id));
     }
 
     @Transactional
