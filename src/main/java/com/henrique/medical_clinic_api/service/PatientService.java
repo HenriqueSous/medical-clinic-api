@@ -6,6 +6,7 @@ import com.henrique.medical_clinic_api.model.Patient;
 import com.henrique.medical_clinic_api.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class PatientService {
         return patientRepository.save(patient);
     }
 
+    @Transactional
     public Patient updateByParts(long id, JsonNode jsonNode) {
         if (jsonNode.isEmpty()) throw new BodyEmptyException();
         Patient patient = findById(id);
