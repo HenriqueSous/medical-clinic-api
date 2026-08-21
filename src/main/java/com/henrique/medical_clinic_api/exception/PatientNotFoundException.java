@@ -8,7 +8,7 @@ public class PatientNotFoundException extends BusinessException {
         super("Patient with id '"+id+"' not found", HttpStatus.NOT_FOUND);
     }
 
-    public PatientNotFoundException(String cpf) {
-        super("Patient with cpf '"+cpf+"' not found", HttpStatus.NOT_FOUND);
+    public PatientNotFoundException(String message) {
+        super(message, HttpStatus.NOT_FOUND);
     }
 }
