@@ -2,7 +2,9 @@ package com.henrique.medical_clinic_api.controller;
 
 import com.henrique.medical_clinic_api.dto.doctor.DoctorRequestDTO;
 import com.henrique.medical_clinic_api.dto.doctor.DoctorResponseDTO;
+import com.henrique.medical_clinic_api.dto.specialty.SpecialtySummaryDTO;
 import com.henrique.medical_clinic_api.mapper.DoctorMapper;
+import com.henrique.medical_clinic_api.mapper.SpecialtyMapper;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.service.DoctorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,9 @@ import java.util.List;
 public class DoctorController {
     @Autowired
     private DoctorService doctorService;
+
+    @Autowired
+    private SpecialtyMapper specialtyMapper;
 
     private final DoctorMapper doctorMapper = DoctorMapper.INSTANCE;
 
@@ -35,6 +40,11 @@ public class DoctorController {
     @GetMapping("/{id}")
     private ResponseEntity<DoctorResponseDTO> getById(@PathVariable long id) {
         return ResponseEntity.ok(doctorMapper.toResponse(doctorService.findById(id)));
+    }
+
+    @GetMapping("/{id}/specialties")
+    private ResponseEntity<List<SpecialtySummaryDTO>> getSpecialties(@PathVariable long id) {
+        return ResponseEntity.ok(specialtyMapper.toSummaryList(doctorService.findSpecialties(id)));
     }
 
     @PostMapping

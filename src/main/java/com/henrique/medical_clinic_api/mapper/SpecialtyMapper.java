@@ -2,6 +2,7 @@ package com.henrique.medical_clinic_api.mapper;
 
 import com.henrique.medical_clinic_api.dto.specialty.SpecialtyRequestDtO;
 import com.henrique.medical_clinic_api.dto.specialty.SpecialtyResponseDTO;
+import com.henrique.medical_clinic_api.dto.specialty.SpecialtySummaryDTO;
 import com.henrique.medical_clinic_api.model.Specialty;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -16,7 +17,11 @@ public interface SpecialtyMapper {
 
     SpecialtyResponseDTO toResponse(Specialty specialty);
 
+    SpecialtySummaryDTO toSummary(Specialty specialty);
+
     List<Specialty> toEntityList(List<SpecialtyRequestDtO> specialtyRequestDtOList);
 
     List<SpecialtyResponseDTO> toResponseList(List<Specialty> specialties);
+
+    List<SpecialtySummaryDTO> toSummaryList(List<Specialty> specialties);
 }

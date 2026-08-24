@@ -31,6 +31,10 @@ public class DoctorService {
         return doctorRepository.findByOptionalFilters(name, crm, uf);
     }
 
+    public List<Specialty> findSpecialties(long id) {
+        return findById(id).getSpecialties();
+    }
+
     @Transactional
     public Doctor save(Doctor doctor) {
         List<Specialty> specialtiesToBeSaved = new ArrayList<>();
