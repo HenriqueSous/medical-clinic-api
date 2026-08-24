@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tools.jackson.databind.JsonNode;
 
 import java.util.List;
 
@@ -51,6 +52,11 @@ public class DoctorController {
     private ResponseEntity<DoctorResponseDTO> post(@RequestBody DoctorRequestDTO doctorRequestDTO) {
         Doctor doctor = doctorMapper.toEntity(doctorRequestDTO);
         return ResponseEntity.ok(doctorMapper.toResponse(doctorService.save(doctor)));
+    }
+
+    @PatchMapping("/{id}")
+    private ResponseEntity<DoctorResponseDTO> patch(@PathVariable long id, @RequestBody JsonNode jsonNode) {
+        return ResponseEntity.ok(doctorMapper.toResponse(doctorService.updateByParts(id, jsonNode)));
     }
 
     @DeleteMapping("/{id}")

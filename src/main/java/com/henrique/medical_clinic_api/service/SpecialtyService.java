@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SpecialtyService {
@@ -21,10 +22,8 @@ public class SpecialtyService {
         return specialtyRepository.findById(id).orElseThrow(() -> new SpecialtyNotFoundException(id));
     }
 
-    public Specialty findByName(String name) {
-        return specialtyRepository.findByNameIgnoreCase(name).orElseThrow(
-                () -> new SpecialtyNotFoundException("Specialty with name '"+name+"' not found")
-        );
+    public Optional<Specialty> findByName(String name) {
+        return specialtyRepository.findByNameIgnoreCase(name);
     }
 
     public Specialty save(Specialty specialty) {
