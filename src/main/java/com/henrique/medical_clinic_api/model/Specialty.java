@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "specialties")
@@ -28,4 +29,16 @@ public class Specialty {
 
     @ManyToMany(mappedBy = "specialties")
     private List<Doctor> doctors = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Specialty specialty = (Specialty) o;
+        return Objects.equals(name, specialty.name) && Objects.equals(description, specialty.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description);
+    }
 }

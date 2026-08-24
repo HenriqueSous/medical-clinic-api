@@ -45,7 +45,9 @@ public class DoctorService {
 
                 specialtiesToBeSaved.add(specialtyByName);
             } else {
-                specialtiesToBeSaved.add(specialty);
+                if (!specialtiesToBeSaved.contains(specialty)) {
+                    specialtiesToBeSaved.add(specialty);
+                }
             }
         }
 
