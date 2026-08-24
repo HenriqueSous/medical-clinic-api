@@ -36,9 +36,14 @@ public class DoctorService {
         List<Specialty> specialtiesToBeSaved = new ArrayList<>();
 
         for (Specialty specialty : doctor.getSpecialties()) {
-            Specialty specialtyByName = specialtyService.findByName(specialty.getName());
+            List<Specialty> specialties = specialtyService.findByOptionalFilters(specialty.getName(), null);
 
-            if (specialtyByName != null) {
+            if (!specialties.isEmpty()) {
+                if (specialties.size() > 1) {
+                    throw new InternalError("Duplicate specialties: "+specialties);
+                }
+
+                Specialty specialtyByName = specialties.getFirst();
                 List<Doctor> list = specialtyByName.getDoctors();
                 list.add(doctor);
                 specialtyByName.setDoctors(list);

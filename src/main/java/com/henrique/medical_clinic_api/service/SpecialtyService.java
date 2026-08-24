@@ -25,7 +25,7 @@ public class SpecialtyService {
         return specialtyRepository.save(specialty);
     }
 
-    public Specialty findByName(String name) {
-        return specialtyRepository.findByNameIgnoreCase(name);
+    public List<Specialty> findByOptionalFilters(String name, String description) {
+        return specialtyRepository.findByOptionalFilters(name, description);
     }
 }
