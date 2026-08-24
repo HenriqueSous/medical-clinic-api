@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SpecialtyRepository extends JpaRepository<Specialty, Long> {
@@ -16,4 +17,6 @@ public interface SpecialtyRepository extends JpaRepository<Specialty, Long> {
                     "(:description IS NULL OR s.description LIKE CONCAT(:description, '%'))"
     )
     List<Specialty> findByOptionalFilters(String name, String description);
+
+    Optional<Specialty> findByNameIgnoreCase(String name);
 }

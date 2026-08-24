@@ -21,6 +21,12 @@ public class SpecialtyService {
         return specialtyRepository.findById(id).orElseThrow(() -> new SpecialtyNotFoundException(id));
     }
 
+    public Specialty findByName(String name) {
+        return specialtyRepository.findByNameIgnoreCase(name).orElseThrow(
+                () -> new SpecialtyNotFoundException("Specialty with name '"+name+"' not found")
+        );
+    }
+
     public Specialty save(Specialty specialty) {
         return specialtyRepository.save(specialty);
     }
