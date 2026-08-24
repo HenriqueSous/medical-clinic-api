@@ -95,8 +95,10 @@ public class DoctorService {
                             () -> new SpecialtyNotFoundException("Specialty with name '" + specialtyToAdd.asString() + "' not found")
                     );
 
-                    specialty.getDoctors().add(doctor);
-                    doctor.getSpecialties().add(specialty);
+                    if (!doctor.getSpecialties().contains(specialty)) {
+                        specialty.getDoctors().add(doctor);
+                        doctor.getSpecialties().add(specialty);
+                    }
                 }
             }
             if (specialties.has("remove")) {
