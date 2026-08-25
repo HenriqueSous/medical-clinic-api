@@ -6,10 +6,9 @@ import com.henrique.medical_clinic_api.mapper.ConsultationMapper;
 import com.henrique.medical_clinic_api.service.ConsultationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/consultations")
@@ -19,6 +18,11 @@ public class ConsultationController {
 
     @Autowired
     private ConsultationService consultationService;
+
+    @GetMapping
+    private ResponseEntity<List<ConsultationResponseDTO>> get() {
+        return ResponseEntity.ok(consultationMapper.toResponseList(consultationService.findAll()));
+    }
 
     @PostMapping
     private ResponseEntity<ConsultationResponseDTO> post(@RequestBody ConsultationRequestDTO consultationRequestDTO) {

@@ -9,6 +9,8 @@ import com.henrique.medical_clinic_api.repository.ConsultationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ConsultationService {
     @Autowired
@@ -22,6 +24,10 @@ public class ConsultationService {
 
     @Autowired
     private PatientService patientService;
+
+    public List<Consultation> findAll() {
+        return consultationRepository.findAll();
+    }
 
     public Consultation save(ConsultationRequestDTO consultationRequestDTO) {
         Consultation consultation = consultationMapper.toEntity(consultationRequestDTO);

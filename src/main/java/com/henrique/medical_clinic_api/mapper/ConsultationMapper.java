@@ -8,6 +8,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", uses = {DoctorMapper.class, PatientMapper.class, SpecialtyMapper.class, ConsultationStatus.class})
 public interface ConsultationMapper {
     ConsultationMapper INSTANCE = Mappers.getMapper(ConsultationMapper.class);
@@ -16,4 +18,6 @@ public interface ConsultationMapper {
 
     @Mapping(target = "status", expression = "java(ConsultationStatus.SCHEDULED)")
     Consultation toEntity(ConsultationRequestDTO consultationRequestDTO);
+
+    List<ConsultationResponseDTO> toResponseList(List<Consultation> consultations);
 }
