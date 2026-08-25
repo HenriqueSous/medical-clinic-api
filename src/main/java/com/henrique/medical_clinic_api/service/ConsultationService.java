@@ -1,6 +1,7 @@
 package com.henrique.medical_clinic_api.service;
 
 import com.henrique.medical_clinic_api.dto.consultation.ConsultationRequestDTO;
+import com.henrique.medical_clinic_api.exception.ConsultationNotFoundException;
 import com.henrique.medical_clinic_api.mapper.ConsultationMapper;
 import com.henrique.medical_clinic_api.model.Consultation;
 import com.henrique.medical_clinic_api.model.Doctor;
@@ -27,6 +28,10 @@ public class ConsultationService {
 
     public List<Consultation> findAll() {
         return consultationRepository.findAll();
+    }
+
+    public Consultation findById(long id) {
+        return consultationRepository.findById(id).orElseThrow(() -> new ConsultationNotFoundException(id));
     }
 
     public Consultation save(ConsultationRequestDTO consultationRequestDTO) {

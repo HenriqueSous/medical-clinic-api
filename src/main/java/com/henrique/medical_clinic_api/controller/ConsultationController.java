@@ -24,6 +24,11 @@ public class ConsultationController {
         return ResponseEntity.ok(consultationMapper.toResponseList(consultationService.findAll()));
     }
 
+    @GetMapping("/{id}")
+    private ResponseEntity<ConsultationResponseDTO> getById(@PathVariable long id) {
+        return ResponseEntity.ok(consultationMapper.toResponse(consultationService.findById(id)));
+    }
+
     @PostMapping
     private ResponseEntity<ConsultationResponseDTO> post(@RequestBody ConsultationRequestDTO consultationRequestDTO) {
         return ResponseEntity.ok(consultationMapper.toResponse(consultationService.save(consultationRequestDTO)));
