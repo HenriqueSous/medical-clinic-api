@@ -48,4 +48,9 @@ public class ConsultationService {
 
         return consultationRepository.save(consultation);
     }
+
+    public void delete(long id) {
+        Consultation consultation = findById(id);
+        consultationRepository.delete(consultation);
+    }
 }
