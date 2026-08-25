@@ -9,6 +9,7 @@ import com.henrique.medical_clinic_api.model.Patient;
 import com.henrique.medical_clinic_api.repository.ConsultationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class ConsultationService {
         return consultationRepository.findById(id).orElseThrow(() -> new ConsultationNotFoundException(id));
     }
 
+    @Transactional
     public Consultation save(ConsultationRequestDTO consultationRequestDTO) {
         Consultation consultation = consultationMapper.toEntity(consultationRequestDTO);
 
