@@ -6,7 +6,7 @@ import com.henrique.medical_clinic_api.model.Consultation;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {DoctorMapper.class, PatientMapper.class, SpecialtyMapper.class})
 public interface ConsultationMapper {
     ConsultationMapper INSTANCE = Mappers.getMapper(ConsultationMapper.class);
 
