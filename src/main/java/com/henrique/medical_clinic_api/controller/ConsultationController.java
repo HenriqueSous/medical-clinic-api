@@ -23,7 +23,7 @@ public class ConsultationController {
 
     @GetMapping
     private ResponseEntity<List<ConsultationResponseDTO>> get(@ModelAttribute ConsultationQueryFilter filter) {
-        return ResponseEntity.ok(consultationMapper.toResponseList(consultationService.findByOptionalFilters(filter)));
+        return ResponseEntity.ok(consultationMapper.toResponseList(consultationService.find(filter)));
     }
 
     @GetMapping("/{id}")

@@ -28,15 +28,11 @@ public class ConsultationService {
     @Autowired
     private PatientService patientService;
 
-    public List<Consultation> findAll() {
-        return consultationRepository.findAll();
-    }
-
     public Consultation findById(long id) {
         return consultationRepository.findById(id).orElseThrow(() -> new ConsultationNotFoundException(id));
     }
 
-    public List<Consultation> findByOptionalFilters(ConsultationQueryFilter filter) {
+    public List<Consultation> find(ConsultationQueryFilter filter) {
         return consultationRepository.findAll(filter.toSpecification());
     }
 
