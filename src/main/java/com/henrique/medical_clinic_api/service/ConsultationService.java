@@ -4,16 +4,14 @@ import com.henrique.medical_clinic_api.dto.consultation.ConsultationRequestDTO;
 import com.henrique.medical_clinic_api.exception.ConsultationNotFoundException;
 import com.henrique.medical_clinic_api.mapper.ConsultationMapper;
 import com.henrique.medical_clinic_api.model.Consultation;
-import com.henrique.medical_clinic_api.model.ConsultationStatus;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Patient;
+import com.henrique.medical_clinic_api.queryFilters.ConsultationQueryFilter;
 import com.henrique.medical_clinic_api.repository.ConsultationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -38,29 +36,8 @@ public class ConsultationService {
         return consultationRepository.findById(id).orElseThrow(() -> new ConsultationNotFoundException(id));
     }
 
-    public List<Consultation> findByOptionalFilters(
-            Long patientId,
-            Long doctorId,
-            LocalDate consultationDate,
-            LocalTime consultationTime,
-            String status,
-            Integer duration
-    ) {
-        ConsultationStatus consultationStatus;
-        if (status != null) {
-            consultationStatus = ConsultationStatus.valueOf(status.toUpperCase());
-        } else {
-            consultationStatus = null;
-        }
-
-        return consultationRepository.findByOptionalFilters(
-                patientId,
-                doctorId,
-                consultationDate,
-                consultationTime,
-                consultationStatus,
-                duration
-        );
+    public List<Consultation> findByOptionalFilters(ConsultationQueryFilter filter) {
+        return consultationRepository.findAll(filter.toSpecification());
     }
 
     @Transactional
