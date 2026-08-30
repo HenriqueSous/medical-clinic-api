@@ -17,7 +17,8 @@ public interface ConsultationMapper {
     ConsultationResponseDTO toResponse(Consultation consultation);
 
     @Mapping(target = "status", expression = "java(ConsultationStatus.SCHEDULED)")
-    Consultation toEntity(ConsultationRequestDTO consultationRequestDTO);
+    @Mapping(target = "duration", source = "duration")
+    Consultation toEntity(ConsultationRequestDTO consultationRequestDTO, Integer duration);
 
     List<ConsultationResponseDTO> toResponseList(List<Consultation> consultations);
 }

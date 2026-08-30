@@ -28,6 +28,8 @@ public class ConsultationService {
     @Autowired
     private PatientService patientService;
 
+    private static final int STANDARD_CONSULTATION_DURATION = 30;
+
     public Consultation findById(long id) {
         return consultationRepository.findById(id).orElseThrow(() -> new ConsultationNotFoundException(id));
     }
@@ -38,7 +40,13 @@ public class ConsultationService {
 
     @Transactional
     public Consultation save(ConsultationRequestDTO consultationRequestDTO) {
-        Consultation consultation = consultationMapper.toEntity(consultationRequestDTO);
+        Integer duration = consultationRequestDTO.duration();
+
+        if (consultationRequestDTO.duration() == null) {
+            duration = STANDARD_CONSULTATION_DURATION;
+        }
+
+        Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
 
         Doctor doctor = doctorService.findById(consultationRequestDTO.doctorId());
         Patient patient = patientService.findById(consultationRequestDTO.patientId());
