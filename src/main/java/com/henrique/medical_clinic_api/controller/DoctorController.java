@@ -6,6 +6,7 @@ import com.henrique.medical_clinic_api.dto.specialty.SpecialtySummaryDTO;
 import com.henrique.medical_clinic_api.mapper.DoctorMapper;
 import com.henrique.medical_clinic_api.mapper.SpecialtyMapper;
 import com.henrique.medical_clinic_api.model.Doctor;
+import com.henrique.medical_clinic_api.queryFilters.DoctorQueryFilter;
 import com.henrique.medical_clinic_api.service.DoctorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,15 +28,8 @@ public class DoctorController {
     private final DoctorMapper doctorMapper = DoctorMapper.INSTANCE;
 
     @GetMapping
-    private ResponseEntity<List<DoctorResponseDTO>> get(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String crm,
-            @RequestParam(required = false) String uf
-    ) {
-        if (name == null && crm == null && uf == null) {
-            return ResponseEntity.ok(doctorMapper.toResponseList(doctorService.findAll()));
-        }
-        return ResponseEntity.ok(doctorMapper.toResponseList(doctorService.findByOptionalFilters(name, crm, uf)));
+    private ResponseEntity<List<DoctorResponseDTO>> get(@ModelAttribute DoctorQueryFilter filter) {
+        return ResponseEntity.ok(doctorMapper.toResponseList(doctorService.find(filter)));
     }
 
     @GetMapping("/{id}")

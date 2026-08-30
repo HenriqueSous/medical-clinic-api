@@ -4,6 +4,7 @@ import com.henrique.medical_clinic_api.exception.DoctorNotFoundException;
 import com.henrique.medical_clinic_api.exception.SpecialtyNotFoundException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
+import com.henrique.medical_clinic_api.queryFilters.DoctorQueryFilter;
 import com.henrique.medical_clinic_api.repository.DoctorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,16 +23,12 @@ public class DoctorService {
     @Autowired
     private SpecialtyService specialtyService;
 
-    public List<Doctor> findAll() {
-        return doctorRepository.findAll();
+    public List<Doctor> find(DoctorQueryFilter doctorQueryFilter) {
+        return doctorRepository.findAll(doctorQueryFilter.toSpecification());
     }
 
     public Doctor findById(long id) {
         return doctorRepository.findById(id).orElseThrow(() -> new DoctorNotFoundException(id));
-    }
-
-    public List<Doctor> findByOptionalFilters(String name, String crm, String uf) {
-        return doctorRepository.findByOptionalFilters(name, crm, uf);
     }
 
     public List<Specialty> findSpecialties(long id) {
