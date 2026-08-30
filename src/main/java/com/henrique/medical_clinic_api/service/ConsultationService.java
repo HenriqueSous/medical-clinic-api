@@ -5,6 +5,7 @@ import com.henrique.medical_clinic_api.exception.AppointmentDurationBelowMinimum
 import com.henrique.medical_clinic_api.exception.ConsultationNotFoundException;
 import com.henrique.medical_clinic_api.mapper.ConsultationMapper;
 import com.henrique.medical_clinic_api.model.Consultation;
+import com.henrique.medical_clinic_api.model.ConsultationStatus;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Patient;
 import com.henrique.medical_clinic_api.queryFilters.ConsultationQueryFilter;
@@ -12,6 +13,7 @@ import com.henrique.medical_clinic_api.repository.ConsultationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.JsonNode;
 
 import java.util.List;
 
@@ -68,5 +70,17 @@ public class ConsultationService {
     public void delete(long id) {
         Consultation consultation = findById(id);
         consultationRepository.delete(consultation);
+    }
+
+    @Transactional
+    public Consultation updateInParts(long id, JsonNode jsonNode) {
+        Consultation consultation = findById(id);
+
+        if (jsonNode.has("status")) {
+            String statusStr = jsonNode.get("status").asString().toUpperCase();
+            consultation.setStatus(ConsultationStatus.valueOf(statusStr));
+        }
+
+        return consultationRepository.save(consultation);
     }
 }
