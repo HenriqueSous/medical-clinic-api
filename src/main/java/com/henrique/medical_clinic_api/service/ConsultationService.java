@@ -1,6 +1,7 @@
 package com.henrique.medical_clinic_api.service;
 
 import com.henrique.medical_clinic_api.dto.consultation.ConsultationRequestDTO;
+import com.henrique.medical_clinic_api.exception.AppointmentDurationBelowMinimumException;
 import com.henrique.medical_clinic_api.exception.ConsultationNotFoundException;
 import com.henrique.medical_clinic_api.mapper.ConsultationMapper;
 import com.henrique.medical_clinic_api.model.Consultation;
@@ -30,6 +31,8 @@ public class ConsultationService {
 
     private static final int STANDARD_CONSULTATION_DURATION = 30;
 
+    private static final int MINIMUM_CONSULTATION_DURATION = 15;
+
     public Consultation findById(long id) {
         return consultationRepository.findById(id).orElseThrow(() -> new ConsultationNotFoundException(id));
     }
@@ -42,8 +45,10 @@ public class ConsultationService {
     public Consultation save(ConsultationRequestDTO consultationRequestDTO) {
         Integer duration = consultationRequestDTO.duration();
 
-        if (consultationRequestDTO.duration() == null) {
+        if (duration == null) {
             duration = STANDARD_CONSULTATION_DURATION;
+        } else if (duration < 15) {
+            throw new AppointmentDurationBelowMinimumException(duration, MINIMUM_CONSULTATION_DURATION);
         }
 
         Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
