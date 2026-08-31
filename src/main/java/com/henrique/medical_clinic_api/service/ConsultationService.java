@@ -53,10 +53,10 @@ public class ConsultationService {
             throw new AppointmentDurationBelowMinimumException(duration, MINIMUM_CONSULTATION_DURATION);
         }
 
-        Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
-
         Doctor doctor = doctorService.findById(consultationRequestDTO.doctorId());
         Patient patient = patientService.findById(consultationRequestDTO.patientId());
+
+        Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
 
         consultation.setDoctor(doctor);
         consultation.setPatient(patient);
