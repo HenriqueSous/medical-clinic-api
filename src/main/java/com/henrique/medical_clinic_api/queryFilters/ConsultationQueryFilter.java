@@ -3,6 +3,7 @@ package com.henrique.medical_clinic_api.queryFilters;
 import com.henrique.medical_clinic_api.model.Consultation;
 import com.henrique.medical_clinic_api.model.ConsultationStatus;
 import com.henrique.medical_clinic_api.repository.specification.ConsultationSpecifications;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,6 +14,7 @@ import java.time.LocalTime;
 
 @Getter
 @Setter
+@Builder
 public class ConsultationQueryFilter {
     private Long patientId;
     private Long doctorId;

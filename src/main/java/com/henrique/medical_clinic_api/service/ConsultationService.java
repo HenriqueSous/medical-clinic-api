@@ -3,6 +3,7 @@ package com.henrique.medical_clinic_api.service;
 import com.henrique.medical_clinic_api.dto.consultation.ConsultationRequestDTO;
 import com.henrique.medical_clinic_api.exception.AppointmentDurationBelowMinimumException;
 import com.henrique.medical_clinic_api.exception.ConsultationNotFoundException;
+import com.henrique.medical_clinic_api.exception.DuplicateAppointmentDateException;
 import com.henrique.medical_clinic_api.mapper.ConsultationMapper;
 import com.henrique.medical_clinic_api.model.Consultation;
 import com.henrique.medical_clinic_api.model.ConsultationStatus;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -53,10 +55,17 @@ public class ConsultationService {
             throw new AppointmentDurationBelowMinimumException(duration, MINIMUM_CONSULTATION_DURATION);
         }
 
-        Doctor doctor = doctorService.findById(consultationRequestDTO.doctorId());
-        Patient patient = patientService.findById(consultationRequestDTO.patientId());
+        long patientId = consultationRequestDTO.patientId();
+        long doctorId = consultationRequestDTO.doctorId();
+        Doctor doctor = doctorService.findById(patientId);
+        Patient patient = patientService.findById(doctorId);
 
         Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
+
+        LocalDate consultationDate = consultation.getConsultationDate();
+        if (!checkExistingAppointment(patientId, consultationDate)) {
+            throw new DuplicateAppointmentDateException(patientId, consultationDate);
+        }
 
         consultation.setDoctor(doctor);
         consultation.setPatient(patient);
@@ -82,5 +91,14 @@ public class ConsultationService {
         }
 
         return consultationRepository.save(consultation);
+    }
+
+    private boolean checkExistingAppointment(long patientId, LocalDate date) {
+        ConsultationQueryFilter filterPatientConsultationDate = ConsultationQueryFilter.builder()
+                .patientId(patientId)
+                .consultationDate(date)
+                .build();
+
+        return find(filterPatientConsultationDate).isEmpty();
     }
 }
