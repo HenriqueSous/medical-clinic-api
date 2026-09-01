@@ -50,8 +50,8 @@ public class ConsultationService {
     public Consultation save(ConsultationRequestDTO consultationRequestDTO) {
         long patientId = consultationRequestDTO.patientId();
         long doctorId = consultationRequestDTO.doctorId();
-        Doctor doctor = doctorService.findById(patientId);
-        Patient patient = patientService.findById(doctorId);
+        Doctor doctor = doctorService.findById(doctorId);
+        Patient patient = patientService.findById(patientId);
 
         int duration = checkDuration(consultationRequestDTO.duration());
         Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
