@@ -47,19 +47,12 @@ public class ConsultationService {
 
     @Transactional
     public Consultation save(ConsultationRequestDTO consultationRequestDTO) {
-        Integer duration = consultationRequestDTO.duration();
-
-        if (duration == null) {
-            duration = STANDARD_CONSULTATION_DURATION;
-        } else if (duration < 15) {
-            throw new AppointmentDurationBelowMinimumException(duration, MINIMUM_CONSULTATION_DURATION);
-        }
-
         long patientId = consultationRequestDTO.patientId();
         long doctorId = consultationRequestDTO.doctorId();
         Doctor doctor = doctorService.findById(patientId);
         Patient patient = patientService.findById(doctorId);
 
+        int duration = checkDuration(consultationRequestDTO.duration());
         Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
 
         LocalDate consultationDate = consultation.getConsultationDate();
@@ -100,5 +93,14 @@ public class ConsultationService {
                 .build();
 
         return find(filterPatientConsultationDate).isEmpty();
+    }
+
+    private int checkDuration(Integer duration) {
+        if (duration == null) {
+            return STANDARD_CONSULTATION_DURATION;
+        } else if (duration < 15) {
+            throw new AppointmentDurationBelowMinimumException(duration, MINIMUM_CONSULTATION_DURATION);
+        }
+        return duration;
     }
 }
