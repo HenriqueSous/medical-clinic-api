@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -56,7 +57,7 @@ public class ConsultationService {
         Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
 
         LocalDate consultationDate = consultation.getConsultationDate();
-        if (!checkExistingAppointment(patientId, consultationDate)) {
+        if (checkExistingAppointment(patientId, consultationDate)) {
             throw new DuplicateAppointmentDateException(patientId, consultationDate);
         }
 
@@ -78,6 +79,18 @@ public class ConsultationService {
     public Consultation updateInParts(long id, JsonNode jsonNode) {
         Consultation consultation = findById(id);
 
+        if (jsonNode.has("consultationDate")) {
+            LocalDate consultationDate = LocalDate.parse(jsonNode.get("consultationDate").asString());
+            consultation.setConsultationDate(consultationDate);
+        }
+        if (jsonNode.has("consultationTime")) {
+            LocalTime consultationTime = LocalTime.parse(jsonNode.get("consultationTime").asString());
+            consultation.setConsultationTime(consultationTime);
+        }
+        if (jsonNode.has("duration")) {
+            int duration = checkDuration(jsonNode.get("consultationTime").asInt());
+            consultation.setDuration(duration);
+        }
         if (jsonNode.has("status")) {
             String statusStr = jsonNode.get("status").asString().toUpperCase();
             consultation.setStatus(ConsultationStatus.valueOf(statusStr));
@@ -92,7 +105,7 @@ public class ConsultationService {
                 .consultationDate(date)
                 .build();
 
-        return find(filterPatientConsultationDate).isEmpty();
+        return !find(filterPatientConsultationDate).isEmpty();
     }
 
     private int checkDuration(Integer duration) {
