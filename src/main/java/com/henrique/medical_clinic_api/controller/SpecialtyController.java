@@ -27,8 +27,14 @@ public class SpecialtyController {
     }
 
     @GetMapping
-    private ResponseEntity<List<SpecialtyResponseDTO>> get() {
-        return ResponseEntity.ok(specialtyMapper.toResponseList(specialtyService.findAll()));
+    private ResponseEntity<List<SpecialtyResponseDTO>> get(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String description
+    ) {
+        if (name == null && description == null) {
+            return ResponseEntity.ok(specialtyMapper.toResponseList(specialtyService.findAll()));
+        }
+        return ResponseEntity.ok(specialtyMapper.toResponseList(specialtyService.findByOptionalFilters(name, description)));
     }
 
     @GetMapping("/{id}")
