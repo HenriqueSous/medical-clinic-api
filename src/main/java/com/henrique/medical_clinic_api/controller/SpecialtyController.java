@@ -7,10 +7,9 @@ import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.service.SpecialtyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("specialties")
@@ -25,5 +24,10 @@ public class SpecialtyController {
     private ResponseEntity<SpecialtyResponseDTO> post(@RequestBody SpecialtyRequestDtO specialtyRequestDtO) {
         Specialty specialty = specialtyMapper.toEntity(specialtyRequestDtO);
         return ResponseEntity.ok(specialtyMapper.toResponse(specialtyService.save(specialty)));
+    }
+
+    @GetMapping
+    private ResponseEntity<List<SpecialtyResponseDTO>> get() {
+        return ResponseEntity.ok(specialtyMapper.toResponseList(specialtyService.findAll()));
     }
 }
