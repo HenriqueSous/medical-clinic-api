@@ -6,6 +6,7 @@ import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.repository.SpecialtyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +39,17 @@ public class SpecialtyService {
 
     public List<Specialty> findByOptionalFilters(String name, String description) {
         return specialtyRepository.findByOptionalFilters(name, description);
+    }
+
+    public Specialty updateInParts(long id, JsonNode jsonNode) {
+        Specialty specialty = findById(id);
+
+        if (jsonNode.has("description")) {
+            String description = jsonNode.get("description").asString();
+            specialty.setDescription(description);
+        }
+
+        return specialtyRepository.save(specialty);
     }
 
     public void delete(long id) {

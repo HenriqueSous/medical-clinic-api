@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tools.jackson.databind.JsonNode;
 
 import java.util.List;
 
@@ -51,6 +52,11 @@ public class SpecialtyController {
     @GetMapping("/{id}/doctors")
     private ResponseEntity<List<DoctorSummaryDTO>> getDoctors(@PathVariable long id) {
         return ResponseEntity.ok(doctorMapper.toSummaryList(specialtyService.findDoctors(id)));
+    }
+
+    @PatchMapping("/{id}")
+    private ResponseEntity<SpecialtyResponseDTO> patch(@PathVariable long id, @RequestBody JsonNode jsonNode) {
+        return ResponseEntity.ok(specialtyMapper.toResponse(specialtyService.updateInParts(id, jsonNode)));
     }
 
     @DeleteMapping("/{id}")
