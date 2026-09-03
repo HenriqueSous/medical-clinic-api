@@ -25,7 +25,8 @@ public class DoctorController {
     @Autowired
     private SpecialtyMapper specialtyMapper;
 
-    private final DoctorMapper doctorMapper = DoctorMapper.INSTANCE;
+    @Autowired
+    private DoctorMapper doctorMapper;
 
     @GetMapping
     private ResponseEntity<List<DoctorResponseDTO>> get(@ModelAttribute DoctorQueryFilter filter) {
