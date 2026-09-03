@@ -3,6 +3,7 @@ package com.henrique.medical_clinic_api.service;
 import com.henrique.medical_clinic_api.dto.consultation.ConsultationRequestDTO;
 import com.henrique.medical_clinic_api.exception.AppointmentDurationBelowMinimumException;
 import com.henrique.medical_clinic_api.exception.ConsultationNotFoundException;
+import com.henrique.medical_clinic_api.exception.DoctorScheduleConflictException;
 import com.henrique.medical_clinic_api.exception.DuplicateAppointmentDateException;
 import com.henrique.medical_clinic_api.mapper.ConsultationMapper;
 import com.henrique.medical_clinic_api.model.Consultation;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -54,6 +56,13 @@ public class ConsultationService {
         Patient patient = patientService.findById(patientId);
 
         int duration = checkDuration(consultationRequestDTO.duration());
+
+        checkDoctorSchedule(
+                doctor,
+                LocalDateTime.of(consultationRequestDTO.consultationDate(), consultationRequestDTO.consultationTime()),
+                duration
+        );
+
         Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
 
         LocalDate consultationDate = consultation.getConsultationDate();
@@ -97,6 +106,20 @@ public class ConsultationService {
         }
 
         return consultationRepository.save(consultation);
+    }
+
+    private void checkDoctorSchedule(Doctor doctor, LocalDateTime dateTime, long duration) {
+        LocalDateTime dateTimePlus = dateTime.plusMinutes(duration);
+
+        for (Consultation consultation : doctor.getConsultations()) {
+            LocalDateTime dateTimeScheduled = LocalDateTime.of(consultation.getConsultationDate(), consultation.getConsultationTime());
+            LocalDateTime dateTimeScheduledPlus = dateTimeScheduled.plusMinutes(duration);
+
+            if (dateTime.isAfter(dateTimeScheduled) && dateTime.isBefore(dateTimeScheduledPlus)||
+            dateTimePlus.isAfter(dateTimeScheduled) && dateTimePlus.isBefore(dateTimeScheduledPlus)) {
+                throw new DoctorScheduleConflictException(doctor.getId(), dateTime);
+            }
+        }
     }
 
     private boolean checkExistingAppointment(long patientId, LocalDate date) {
