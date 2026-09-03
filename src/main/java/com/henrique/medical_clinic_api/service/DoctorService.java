@@ -86,11 +86,12 @@ public class DoctorService {
             if (specialties.has("add")) {
                 // Ainda não cria nova specialty automaticamente
                 for (JsonNode specialtyToAdd : specialties.get("add").asArray()) {
-                    Optional<Specialty> byName = specialtyService.findByName(specialtyToAdd.asString());
+                    List<Specialty> specialtyList = specialtyService.findByOptionalFilters(specialtyToAdd.asString(), null);
 
-                    Specialty specialty = byName.orElseThrow(
-                            () -> new SpecialtyNotFoundException("Specialty with name '" + specialtyToAdd.asString() + "' not found")
-                    );
+                    if (specialtyList.isEmpty()) {
+                        throw new SpecialtyNotFoundException("Specialty with name '" + specialtyToAdd.asString() + "' not found");
+                    }
+                    Specialty specialty = specialtyList.getFirst();
 
                     if (!doctor.getSpecialties().contains(specialty)) {
                         specialty.getDoctors().add(doctor);
@@ -100,11 +101,12 @@ public class DoctorService {
             }
             if (specialties.has("remove")) {
                 for (JsonNode specialtyToRemove : specialties.get("remove").asArray()) {
-                    Optional<Specialty> byName = specialtyService.findByName(specialtyToRemove.asString());
+                    List<Specialty> specialtyList = specialtyService.findByOptionalFilters(specialtyToRemove.asString(), null);
 
-                    Specialty specialty = byName.orElseThrow(
-                            () -> new SpecialtyNotFoundException("Specialty with name '" + specialtyToRemove.asString() + "' not found")
-                    );
+                    if (specialtyList.isEmpty()) {
+                        throw new SpecialtyNotFoundException("Specialty with name '" + specialtyToRemove.asString() + "' not found");
+                    }
+                    Specialty specialty = specialtyList.getFirst();
 
                     doctor.getSpecialties().remove(specialty);
                 }

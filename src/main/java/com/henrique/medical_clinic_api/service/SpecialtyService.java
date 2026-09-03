@@ -24,10 +24,6 @@ public class SpecialtyService {
         return specialtyRepository.findById(id).orElseThrow(() -> new SpecialtyNotFoundException(id));
     }
 
-    public Optional<Specialty> findByName(String name) {
-        return specialtyRepository.findByNameIgnoreCase(name);
-    }
-
     public List<Doctor> findDoctors(long id) {
         Specialty specialty = findById(id);
         return specialty.getDoctors();
