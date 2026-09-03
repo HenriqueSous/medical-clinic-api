@@ -1,5 +1,6 @@
 package com.henrique.medical_clinic_api.service;
 
+import com.henrique.medical_clinic_api.exception.SpecialtyAlreadyExistsException;
 import com.henrique.medical_clinic_api.exception.SpecialtyNotFoundException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
@@ -9,7 +10,6 @@ import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class SpecialtyService {
@@ -30,6 +30,10 @@ public class SpecialtyService {
     }
 
     public Specialty save(Specialty specialty) {
+        List<Specialty> specialties = findByOptionalFilters(specialty.getName(), null);
+        if (!specialties.isEmpty()) {
+            throw new SpecialtyAlreadyExistsException(specialty.getName());
+        }
         return specialtyRepository.save(specialty);
     }
 
