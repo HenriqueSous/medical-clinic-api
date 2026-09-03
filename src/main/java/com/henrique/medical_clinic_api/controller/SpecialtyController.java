@@ -8,6 +8,7 @@ import com.henrique.medical_clinic_api.mapper.SpecialtyMapper;
 import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.service.SpecialtyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,5 +51,11 @@ public class SpecialtyController {
     @GetMapping("/{id}/doctors")
     private ResponseEntity<List<DoctorSummaryDTO>> getDoctors(@PathVariable long id) {
         return ResponseEntity.ok(doctorMapper.toSummaryList(specialtyService.findDoctors(id)));
+    }
+
+    @DeleteMapping("/{id}")
+    private ResponseEntity<Void> delete(@PathVariable long id) {
+        specialtyService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -39,4 +39,9 @@ public class SpecialtyService {
     public List<Specialty> findByOptionalFilters(String name, String description) {
         return specialtyRepository.findByOptionalFilters(name, description);
     }
+
+    public void delete(long id) {
+        Specialty specialty = findById(id);
+        specialtyRepository.delete(specialty);
+    }
 }
