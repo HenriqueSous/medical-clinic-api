@@ -30,4 +30,9 @@ public class SpecialtyController {
     private ResponseEntity<List<SpecialtyResponseDTO>> get() {
         return ResponseEntity.ok(specialtyMapper.toResponseList(specialtyService.findAll()));
     }
+
+    @GetMapping("/{id}")
+    private ResponseEntity<SpecialtyResponseDTO> getById(@PathVariable long id) {
+        return ResponseEntity.ok(specialtyMapper.toResponse(specialtyService.findById(id)));
+    }
 }
