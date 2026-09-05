@@ -1,7 +1,7 @@
 package com.henrique.medical_clinic_api.service;
 
-import com.henrique.medical_clinic_api.exception.BodyEmptyException;
-import com.henrique.medical_clinic_api.exception.PatientNotFoundException;
+import com.henrique.medical_clinic_api.exception.validation.BodyEmptyException;
+import com.henrique.medical_clinic_api.exception.resource.PatientNotFoundException;
 import com.henrique.medical_clinic_api.model.Patient;
 import com.henrique.medical_clinic_api.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,10 +1,10 @@
 package com.henrique.medical_clinic_api.service;
 
 import com.henrique.medical_clinic_api.dto.consultation.ConsultationRequestDTO;
-import com.henrique.medical_clinic_api.exception.AppointmentDurationBelowMinimumException;
-import com.henrique.medical_clinic_api.exception.ConsultationNotFoundException;
-import com.henrique.medical_clinic_api.exception.DoctorScheduleConflictException;
-import com.henrique.medical_clinic_api.exception.DuplicateAppointmentDateException;
+import com.henrique.medical_clinic_api.exception.validation.AppointmentDurationBelowMinimumException;
+import com.henrique.medical_clinic_api.exception.resource.ConsultationNotFoundException;
+import com.henrique.medical_clinic_api.exception.domain.DoctorScheduleConflictException;
+import com.henrique.medical_clinic_api.exception.domain.DuplicateAppointmentDateException;
 import com.henrique.medical_clinic_api.mapper.ConsultationMapper;
 import com.henrique.medical_clinic_api.model.Consultation;
 import com.henrique.medical_clinic_api.model.ConsultationStatus;

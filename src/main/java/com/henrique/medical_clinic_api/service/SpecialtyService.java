@@ -1,7 +1,7 @@
 package com.henrique.medical_clinic_api.service;
 
-import com.henrique.medical_clinic_api.exception.SpecialtyAlreadyExistsException;
-import com.henrique.medical_clinic_api.exception.SpecialtyNotFoundException;
+import com.henrique.medical_clinic_api.exception.domain.SpecialtyAlreadyExistsException;
+import com.henrique.medical_clinic_api.exception.resource.SpecialtyNotFoundException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.repository.SpecialtyRepository;

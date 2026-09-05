@@ -1,7 +1,7 @@
 package com.henrique.medical_clinic_api.service;
 
-import com.henrique.medical_clinic_api.exception.DoctorNotFoundException;
-import com.henrique.medical_clinic_api.exception.SpecialtyNotFoundException;
+import com.henrique.medical_clinic_api.exception.resource.DoctorNotFoundException;
+import com.henrique.medical_clinic_api.exception.resource.SpecialtyNotFoundException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.queryFilters.DoctorQueryFilter;
@@ -13,7 +13,6 @@ import tools.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class DoctorService {

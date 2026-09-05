@@ -1,6 +1,6 @@
-package com.henrique.medical_clinic_api.exception;
+package com.henrique.medical_clinic_api.exception.validation;
 
-import com.henrique.medical_clinic_api.exception.model.BusinessException;
+import com.henrique.medical_clinic_api.exception.domain.BusinessException;
 import org.springframework.http.HttpStatus;
 
 public class AppointmentDurationBelowMinimumException extends BusinessException {

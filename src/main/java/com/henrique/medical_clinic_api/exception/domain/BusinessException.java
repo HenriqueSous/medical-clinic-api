@@ -1,4 +1,4 @@
-package com.henrique.medical_clinic_api.exception.model;
+package com.henrique.medical_clinic_api.exception.domain;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
