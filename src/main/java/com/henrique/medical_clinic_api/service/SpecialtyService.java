@@ -1,7 +1,7 @@
 package com.henrique.medical_clinic_api.service;
 
 import com.henrique.medical_clinic_api.exception.domain.SpecialtyAlreadyExistsException;
-import com.henrique.medical_clinic_api.exception.resource.SpecialtyNotFoundException;
+import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.repository.SpecialtyRepository;
@@ -21,7 +21,7 @@ public class SpecialtyService {
     }
 
     public Specialty findById(long id) {
-        return specialtyRepository.findById(id).orElseThrow(() -> new SpecialtyNotFoundException(id));
+        return specialtyRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Specialty", id));
     }
 
     public List<Doctor> findDoctors(long id) {

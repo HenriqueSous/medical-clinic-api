@@ -1,10 +1,10 @@
 package com.henrique.medical_clinic_api.service;
 
 import com.henrique.medical_clinic_api.dto.consultation.ConsultationRequestDTO;
-import com.henrique.medical_clinic_api.exception.validation.AppointmentDurationBelowMinimumException;
-import com.henrique.medical_clinic_api.exception.resource.ConsultationNotFoundException;
 import com.henrique.medical_clinic_api.exception.domain.DoctorScheduleConflictException;
 import com.henrique.medical_clinic_api.exception.domain.DuplicateAppointmentDateException;
+import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
+import com.henrique.medical_clinic_api.exception.validation.AppointmentDurationBelowMinimumException;
 import com.henrique.medical_clinic_api.mapper.ConsultationMapper;
 import com.henrique.medical_clinic_api.model.Consultation;
 import com.henrique.medical_clinic_api.model.ConsultationStatus;
@@ -41,7 +41,7 @@ public class ConsultationService {
     private static final int MINIMUM_CONSULTATION_DURATION = 15;
 
     public Consultation findById(long id) {
-        return consultationRepository.findById(id).orElseThrow(() -> new ConsultationNotFoundException(id));
+        return consultationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Consultation", id));
     }
 
     public List<Consultation> find(ConsultationQueryFilter filter) {

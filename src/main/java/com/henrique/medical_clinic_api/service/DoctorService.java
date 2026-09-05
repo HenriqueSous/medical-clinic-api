@@ -1,7 +1,6 @@
 package com.henrique.medical_clinic_api.service;
 
-import com.henrique.medical_clinic_api.exception.resource.DoctorNotFoundException;
-import com.henrique.medical_clinic_api.exception.resource.SpecialtyNotFoundException;
+import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.queryFilters.DoctorQueryFilter;
@@ -27,7 +26,7 @@ public class DoctorService {
     }
 
     public Doctor findById(long id) {
-        return doctorRepository.findById(id).orElseThrow(() -> new DoctorNotFoundException(id));
+        return doctorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Doctor", id));
     }
 
     public List<Specialty> findSpecialties(long id) {
@@ -88,7 +87,7 @@ public class DoctorService {
                     List<Specialty> specialtyList = specialtyService.findByOptionalFilters(specialtyToAdd.asString(), null);
 
                     if (specialtyList.isEmpty()) {
-                        throw new SpecialtyNotFoundException("Specialty with name '" + specialtyToAdd.asString() + "' not found");
+                        throw new ResourceNotFoundException("Specialty with name '" + specialtyToAdd.asString() + "' not found");
                     }
                     Specialty specialty = specialtyList.getFirst();
 
@@ -103,7 +102,7 @@ public class DoctorService {
                     List<Specialty> specialtyList = specialtyService.findByOptionalFilters(specialtyToRemove.asString(), null);
 
                     if (specialtyList.isEmpty()) {
-                        throw new SpecialtyNotFoundException("Specialty with name '" + specialtyToRemove.asString() + "' not found");
+                        throw new ResourceNotFoundException("Specialty with name '" + specialtyToRemove.asString() + "' not found");
                     }
                     Specialty specialty = specialtyList.getFirst();
 
