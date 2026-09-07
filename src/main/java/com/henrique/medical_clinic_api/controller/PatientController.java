@@ -5,6 +5,7 @@ import com.henrique.medical_clinic_api.dto.patient.PatientResponseDTO;
 import com.henrique.medical_clinic_api.mapper.PatientMapper;
 import com.henrique.medical_clinic_api.model.Patient;
 import com.henrique.medical_clinic_api.service.PatientService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class PatientController {
     }
 
     @PostMapping
-    private ResponseEntity<PatientResponseDTO> post(@RequestBody PatientRequestDTO patientRequestDTO) {
+    private ResponseEntity<PatientResponseDTO> post(@Valid @RequestBody PatientRequestDTO patientRequestDTO) {
         Patient patient = patientMapper.toEntity(patientRequestDTO);
         PatientResponseDTO patientSaved = patientMapper.toResponse(patientService.savePatient(patient));
 
