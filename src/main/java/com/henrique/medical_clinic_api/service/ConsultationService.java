@@ -139,4 +139,18 @@ public class ConsultationService {
         }
         return duration;
     }
+
+    public void cancelOverdueAppointments() {
+        LocalDateTime dateTimeMinusOneDay = LocalDateTime.now().minusHours(24);
+
+        for (Consultation consultation : find(ConsultationQueryFilter.builder().build())) {
+            LocalDateTime dateTime = LocalDateTime.of(consultation.getConsultationDate(), consultation.getConsultationTime());
+            if (dateTime.isBefore(dateTimeMinusOneDay)) {
+                if (consultation.getStatus().equals(ConsultationStatus.SCHEDULED) || consultation.getStatus().equals(ConsultationStatus.CONFIRMED)) {
+                    consultation.setStatus(ConsultationStatus.CANCELED);
+                    consultationRepository.save(consultation);
+                }
+            }
+        }
+    }
 }
