@@ -5,6 +5,7 @@ import com.henrique.medical_clinic_api.dto.consultation.ConsultationResponseDTO;
 import com.henrique.medical_clinic_api.mapper.ConsultationMapper;
 import com.henrique.medical_clinic_api.queryFilters.ConsultationQueryFilter;
 import com.henrique.medical_clinic_api.service.ConsultationService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class ConsultationController {
     }
 
     @PostMapping
-    private ResponseEntity<ConsultationResponseDTO> post(@RequestBody ConsultationRequestDTO consultationRequestDTO) {
+    private ResponseEntity<ConsultationResponseDTO> post(@Valid @RequestBody ConsultationRequestDTO consultationRequestDTO) {
         return ResponseEntity.ok(consultationMapper.toResponse(consultationService.save(consultationRequestDTO)));
     }
 

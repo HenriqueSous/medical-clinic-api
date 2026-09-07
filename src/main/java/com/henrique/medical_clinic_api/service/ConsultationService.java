@@ -56,7 +56,7 @@ public class ConsultationService {
         Doctor doctor = doctorService.findById(doctorId);
         Patient patient = patientService.findById(patientId);
 
-        int duration = checkDuration(consultationRequestDTO.duration());
+        int duration = consultationRequestDTO.duration();
 
         checkDoctorSchedule(
                 doctor,
