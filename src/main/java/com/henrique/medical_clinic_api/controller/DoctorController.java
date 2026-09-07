@@ -8,6 +8,7 @@ import com.henrique.medical_clinic_api.mapper.SpecialtyMapper;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.queryFilters.DoctorQueryFilter;
 import com.henrique.medical_clinic_api.service.DoctorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,7 @@ public class DoctorController {
     }
 
     @PostMapping
-    private ResponseEntity<DoctorResponseDTO> post(@RequestBody DoctorRequestDTO doctorRequestDTO) {
+    private ResponseEntity<DoctorResponseDTO> post(@Valid @RequestBody DoctorRequestDTO doctorRequestDTO) {
         Doctor doctor = doctorMapper.toEntity(doctorRequestDTO);
         return ResponseEntity.ok(doctorMapper.toResponse(doctorService.save(doctor)));
     }
