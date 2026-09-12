@@ -5,6 +5,7 @@ import com.henrique.medical_clinic_api.dto.exception.ValidationExceptionResponse
 import com.henrique.medical_clinic_api.exception.domain.BusinessException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.Nullable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -34,6 +35,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                     .message(ex.getMessage())
                     .path(servlet.getRequestURI()).build(),
             status
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleDataIntegrityViolationException(DataIntegrityViolationException ex, HttpServletRequest servlet) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        String message = ex.getRootCause().getMessage();
+        message = ex.getRootCause().getCause().getMessage();
+//        if (message.contains("patients.cpf")) {
+//            message = "asa";
+//        }
+
+        return new ResponseEntity<>(
+                ExceptionResponseDTO.builder()
+                        .timestamp(LocalDateTime.now())
+                        .status(status.value())
+                        .error(status.name())
+                        .message(ex.getRootCause().getMessage())
+                        .path(servlet.getRequestURI())
+                        .build(),
+                status
         );
     }
 
