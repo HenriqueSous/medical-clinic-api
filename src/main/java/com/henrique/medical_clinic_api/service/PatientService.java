@@ -1,5 +1,6 @@
 package com.henrique.medical_clinic_api.service;
 
+import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.exception.validation.BodyEmptyException;
 import com.henrique.medical_clinic_api.model.Patient;
@@ -29,6 +30,11 @@ public class PatientService {
     }
 
     public Patient savePatient(Patient patient) {
+        List<Patient> patients = findByOptionalFilters(null, patient.getCpf());
+        if (!patients.isEmpty()) {
+            throw new DuplicateResourceException("Patient", "CPF", patient.getCpf());
+        }
+
         return patientRepository.save(patient);
     }
 
