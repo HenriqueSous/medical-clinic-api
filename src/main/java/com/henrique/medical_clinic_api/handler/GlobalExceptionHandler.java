@@ -20,6 +20,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -41,18 +43,26 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ExceptionResponseDTO> handleDataIntegrityViolationException(DataIntegrityViolationException ex, HttpServletRequest servlet) {
         HttpStatus status = HttpStatus.CONFLICT;
-        String message = ex.getRootCause().getMessage();
-        message = ex.getRootCause().getCause().getMessage();
-//        if (message.contains("patients.cpf")) {
-//            message = "asa";
-//        }
+
+        String rootMessage = ex.getRootCause().getMessage();
+        String message = rootMessage;
+
+        if (rootMessage.contains("patients.cpf")) {
+            Pattern pattern = Pattern.compile("'(\\d+)'");
+            Matcher matcher = pattern.matcher(rootMessage);
+            String cpf = "";
+            if (matcher.find()) {
+                cpf = matcher.group(1);
+            }
+            message = String.format("Duplicate Patient with CPF '"+cpf+"'");
+        }
 
         return new ResponseEntity<>(
                 ExceptionResponseDTO.builder()
                         .timestamp(LocalDateTime.now())
                         .status(status.value())
                         .error(status.name())
-                        .message(ex.getRootCause().getMessage())
+                        .message(message)
                         .path(servlet.getRequestURI())
                         .build(),
                 status
