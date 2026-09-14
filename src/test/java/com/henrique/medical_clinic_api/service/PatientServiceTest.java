@@ -53,4 +53,15 @@ class PatientServiceTest {
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> patientService.findById(id));
     }
+
+    @Test
+    void save_SaveNewPatient_WhenCorrectDataIsProvided() {
+        Patient patientMock = PatientUtil.createPatient(1, "Henrique", "12345678987");
+        Mockito.when(patientRepository.save(patientMock)).thenReturn(patientMock);
+
+        Patient patient = patientService.savePatient(patientMock);
+        Assertions.assertNotNull(patient);
+        Assertions.assertEquals(patientMock.getName(), patient.getName());
+        Assertions.assertEquals(patientMock.getCpf(), patient.getCpf());
+    }
 }
