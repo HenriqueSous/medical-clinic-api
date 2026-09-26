@@ -48,20 +48,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         String message = rootMessage;
 
         if (rootMessage.contains("patients.cpf")) {
-            Pattern pattern = Pattern.compile("'(\\d+)'");
-            Matcher matcher = pattern.matcher(rootMessage);
-            String cpf = "";
-            if (matcher.find()) {
-                cpf = matcher.group(1);
-            }
+            String cpf = captureRootMessagePattern("'(\\d+)'", rootMessage);
             message = String.format("Duplicate Patient with CPF '"+cpf+"'");
+
         } else if (rootMessage.contains("doctors.uk_crm_uf")) {
-            Pattern pattern = Pattern.compile("'(\\d+-\\w+)'");
-            Matcher matcher = pattern.matcher(rootMessage);
-            String crm = "";
-            if (matcher.find()) {
-                crm = matcher.group(1);
-            }
+            String crm = captureRootMessagePattern("'(\\d+-\\w{2})'", rootMessage);
             message = String.format("Duplicate Doctor with CRM '"+crm+"'");
         }
 
@@ -100,5 +91,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         .build(),
                 HttpStatus.BAD_REQUEST
         );
+    }
+
+    private String captureRootMessagePattern(String regex, String rootMessage) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(rootMessage);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 }
