@@ -1,5 +1,6 @@
 package com.henrique.medical_clinic_api.service;
 
+import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
@@ -37,18 +38,21 @@ public class DoctorService {
     public Doctor save(Doctor doctor) {
         List<Specialty> specialtiesToBeSaved = new ArrayList<>();
 
+        List<Doctor> doctors = find(new DoctorQueryFilter(null, doctor.getCrm(), doctor.getUf()));
+        if (!doctors.isEmpty()) {
+            throw new DuplicateResourceException("Doctor", "CRM", String.format("%s-%s", doctor.getCrm(), doctor.getUf()));
+        }
+
         for (Specialty specialty : doctor.getSpecialties()) {
             List<Specialty> specialties = specialtyService.findByOptionalFilters(specialty.getName(), null);
 
             if (!specialties.isEmpty()) {
                 if (specialties.size() > 1) {
-                    throw new InternalError("Duplicate specialties: "+specialties);
+                    throw new DuplicateResourceException("Specialty", "name", specialty.getName());
                 }
 
                 Specialty specialtyByName = specialties.getFirst();
-                List<Doctor> list = specialtyByName.getDoctors();
-                list.add(doctor);
-                specialtyByName.setDoctors(list);
+                specialtyByName.getDoctors().add(doctor);
 
                 specialtiesToBeSaved.add(specialtyByName);
             } else {
