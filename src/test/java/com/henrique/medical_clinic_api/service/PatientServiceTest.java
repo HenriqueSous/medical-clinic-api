@@ -1,5 +1,6 @@
 package com.henrique.medical_clinic_api.service;
 
+import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.model.Patient;
 import com.henrique.medical_clinic_api.repository.PatientRepository;
@@ -63,5 +64,13 @@ class PatientServiceTest {
         Assertions.assertNotNull(patient);
         Assertions.assertEquals(patientMock.getName(), patient.getName());
         Assertions.assertEquals(patientMock.getCpf(), patient.getCpf());
+    }
+
+    @Test
+    void save_ThrowsDuplicateResourceException_When() {
+        Patient patientMock = PatientUtil.createPatient(1, "Henrique", "123");
+        Mockito.when(patientService.findByOptionalFilters(null, patientMock.getCpf())).thenReturn(List.of(patientMock));
+
+        Assertions.assertThrows(DuplicateResourceException.class, () -> patientService.savePatient(patientMock));
     }
 }
