@@ -13,6 +13,12 @@ public class DoctorQueryFilter {
     private String crm;
     private String uf;
 
+    public DoctorQueryFilter(String name, String crm, String uf) {
+        this.name = name;
+        this.crm = crm;
+        this.uf = uf;
+    }
+
     public Specification<Doctor> toSpecification() {
         return DoctorSpecification.startWithName(name)
                 .and(DoctorSpecification.startWithCrm(crm))
