@@ -55,6 +55,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 cpf = matcher.group(1);
             }
             message = String.format("Duplicate Patient with CPF '"+cpf+"'");
+        } else if (rootMessage.contains("doctors.uk_crm_uf")) {
+            Pattern pattern = Pattern.compile("'(\\d+-\\w+)'");
+            Matcher matcher = pattern.matcher(rootMessage);
+            String crm = "";
+            if (matcher.find()) {
+                crm = matcher.group(1);
+            }
+            message = String.format("Duplicate Doctor with CRM '"+crm+"'");
         }
 
         return new ResponseEntity<>(
