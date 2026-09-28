@@ -96,4 +96,16 @@ class PatientServiceTest {
         Mockito.verify(patientRepository, Mockito.times(1)).delete(patientMock);
         Mockito.verify(patientRepository, Mockito.times(1)).findById(id);
     }
+
+    @Test
+    void delete_ThrowsResourceNotFoundException_WhenPatientNotExists() {
+        long id = 1L;
+
+        Mockito.when(patientRepository.findById(id))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> patientService.deletePatient(id));
+        Mockito.verify(patientRepository, Mockito.times(0)).delete(ArgumentMatchers.any(Patient.class));
+        Mockito.verify(patientRepository, Mockito.times(1)).findById(id);
+    }
 }
