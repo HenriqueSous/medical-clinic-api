@@ -9,4 +9,10 @@ public class DoctorUtil {
     public static Doctor createDoctor(long id, String name, String crm, String uf) {
         return new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(), List.of(), List.of());
     }
+
+    public static List<Doctor> listOfDoctors() {
+        return List.of(
+                createDoctor(1, "Henrique", "12345", "BA")
+        );
+    }
 }

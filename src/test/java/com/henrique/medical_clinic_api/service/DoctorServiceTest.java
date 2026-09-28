@@ -8,7 +8,10 @@ import com.henrique.medical_clinic_api.util.DoctorUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -21,6 +24,17 @@ class DoctorServiceTest {
 
     @InjectMocks
     private DoctorService doctorService;
+
+    @Test
+    void findAll_ReturnListOfAllDoctors_WhenSuccessful() {
+        Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
+                .thenReturn(DoctorUtil.listOfDoctors());
+
+        List<Doctor> doctors = doctorService.find(new DoctorQueryFilter(null, null, null));
+
+        Assertions.assertNotNull(doctors);
+        Assertions.assertEquals(1, doctors.size());
+    }
 
     @Test
     void save_ThrowsDuplicateResourceException_WhenDoctorExists() {
