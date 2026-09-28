@@ -83,4 +83,17 @@ class PatientServiceTest {
 
         Assertions.assertThrows(DuplicateResourceException.class, () -> patientService.savePatient(patientMock));
     }
+
+    @Test
+    void delete_DeletePatient_WhenPatientExists() {
+        long id = 1L;
+        Patient patientMock = PatientUtil.createPatient(id, "Henrique", "12345678987");
+
+        Mockito.when(patientRepository.findById(id))
+                .thenReturn(Optional.of(patientMock));
+
+        patientService.deletePatient(id);
+        Mockito.verify(patientRepository, Mockito.times(1)).delete(patientMock);
+        Mockito.verify(patientRepository, Mockito.times(1)).findById(id);
+    }
 }
