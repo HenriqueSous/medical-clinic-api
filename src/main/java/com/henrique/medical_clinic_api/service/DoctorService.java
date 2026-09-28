@@ -119,6 +119,7 @@ public class DoctorService {
     }
 
     public void delete(long id) {
-        doctorRepository.deleteById(id);
+        Doctor doctor = findById(id);
+        doctorRepository.delete(doctor);
     }
 }
