@@ -3,11 +3,11 @@ package com.henrique.medical_clinic_api.service;
 import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.model.Doctor;
-import com.henrique.medical_clinic_api.model.Patient;
+import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.queryFilters.DoctorQueryFilter;
 import com.henrique.medical_clinic_api.repository.DoctorRepository;
 import com.henrique.medical_clinic_api.util.DoctorUtil;
-import com.henrique.medical_clinic_api.util.PatientUtil;
+import com.henrique.medical_clinic_api.util.SpecialtyUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +25,9 @@ import java.util.Optional;
 class DoctorServiceTest {
     @Mock
     private DoctorRepository doctorRepository;
+
+    @Mock
+    private SpecialtyService specialtyService;
 
     @InjectMocks
     private DoctorService doctorService;
@@ -61,6 +64,28 @@ class DoctorServiceTest {
         Mockito.when(doctorRepository.findById(id)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.findById(id));
+    }
+
+    @Test
+    void save_SaveNewDoctor_WhenCorrectDataIsProvided() {
+        Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Clínico Geral", "Descrição");
+        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", specialty);
+
+        Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
+                .thenReturn(List.of());
+        Mockito.when(specialtyService.findByOptionalFilters(specialty.getName(), null))
+                .thenReturn(List.of());
+        Mockito.when(doctorRepository.save(doctorMock))
+                .thenReturn(doctorMock);
+
+        Doctor doctorSaved = doctorService.save(doctorMock);
+
+        Assertions.assertNotNull(doctorSaved);
+        Assertions.assertEquals(doctorMock.getId(), doctorSaved.getId());
+        Assertions.assertEquals(doctorMock.getName(), doctorSaved.getName());
+        Assertions.assertEquals(doctorMock.getCrm(), doctorSaved.getCrm());
+        Assertions.assertEquals(doctorMock.getUf(), doctorSaved.getUf());
+        Assertions.assertEquals(doctorMock.getSpecialties(), doctorSaved.getSpecialties());
     }
 
     @Test
