@@ -1,6 +1,7 @@
 package com.henrique.medical_clinic_api.service;
 
 import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
+import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Patient;
 import com.henrique.medical_clinic_api.queryFilters.DoctorQueryFilter;
@@ -42,7 +43,7 @@ class DoctorServiceTest {
     @Test
     void findById_ReturnDoctor_WhenIdIsFound() {
         long id = 1L;
-        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA");
+        Doctor doctorMock = DoctorUtil.createDoctor(id, "Henrique", "12345", "BA");
         Mockito.when(doctorRepository.findById(id)).thenReturn(Optional.of(doctorMock));
 
         Doctor doctor = doctorService.findById(id);
@@ -52,6 +53,14 @@ class DoctorServiceTest {
         Assertions.assertEquals(doctorMock.getName(), doctor.getName());
         Assertions.assertEquals(doctorMock.getCrm(), doctor.getCrm());
         Assertions.assertEquals(doctorMock.getUf(), doctor.getUf());
+    }
+
+    @Test
+    void findById_ThrowsResourceNotFoundException_WhenIdIsNotFound() {
+        long id = 99L;
+        Mockito.when(doctorRepository.findById(id)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.findById(id));
     }
 
     @Test
