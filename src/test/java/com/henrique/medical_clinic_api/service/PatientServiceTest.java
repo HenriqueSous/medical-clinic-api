@@ -67,7 +67,7 @@ class PatientServiceTest {
     }
 
     @Test
-    void save_ThrowsDuplicateResourceException_When() {
+    void save_ThrowsDuplicateResourceException_WhenPatientExists() {
         Patient patientMock = PatientUtil.createPatient(1, "Henrique", "123");
         Mockito.when(patientService.findByOptionalFilters(null, patientMock.getCpf())).thenReturn(List.of(patientMock));
 
