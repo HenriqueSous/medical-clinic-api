@@ -8,6 +8,7 @@ import com.henrique.medical_clinic_api.util.PatientUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -36,7 +37,7 @@ class PatientServiceTest {
     @Test
     void findById_ReturnPatient_WhenIdIsFound() {
         long id = 1L;
-        Patient patientMock = PatientUtil.createPatient(id, "Henrique", "123456");
+        Patient patientMock = PatientUtil.createPatient(id, "Henrique", "12345678987");
         Mockito.when(patientRepository.findById(id)).thenReturn(Optional.of(patientMock));
 
         Patient patient = patientService.findById(id);
@@ -50,7 +51,7 @@ class PatientServiceTest {
     @Test
     void findById_ThrowsResourceNotFoundException_WhenIdIsNotFound() {
         long id = 99L;
-        Mockito.when(patientRepository.findById(id)).thenThrow(ResourceNotFoundException.class);
+        Mockito.when(patientRepository.findById(id)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> patientService.findById(id));
     }
@@ -58,18 +59,27 @@ class PatientServiceTest {
     @Test
     void save_SaveNewPatient_WhenCorrectDataIsProvided() {
         Patient patientMock = PatientUtil.createPatient(1, "Henrique", "12345678987");
-        Mockito.when(patientRepository.save(patientMock)).thenReturn(patientMock);
+        Mockito.when(patientRepository.save(ArgumentMatchers.any(Patient.class)))
+                .thenAnswer(
+                        inv -> {
+                            Patient p = inv.getArgument(0);
+                            p.setId(10L);
+                            return p;
+                        }
+                );
 
         Patient patient = patientService.savePatient(patientMock);
+
         Assertions.assertNotNull(patient);
         Assertions.assertEquals(patientMock.getName(), patient.getName());
+        Assertions.assertEquals(10L, patient.getId());
         Assertions.assertEquals(patientMock.getCpf(), patient.getCpf());
     }
 
     @Test
     void save_ThrowsDuplicateResourceException_WhenPatientExists() {
-        Patient patientMock = PatientUtil.createPatient(1, "Henrique", "123");
-        Mockito.when(patientService.findByOptionalFilters(null, patientMock.getCpf())).thenReturn(List.of(patientMock));
+        Patient patientMock = PatientUtil.createPatient(1, "Henrique", "12345678987");
+        Mockito.when(patientRepository.findByOptionalFilters(null, patientMock.getCpf())).thenReturn(List.of(patientMock));
 
         Assertions.assertThrows(DuplicateResourceException.class, () -> patientService.savePatient(patientMock));
     }
