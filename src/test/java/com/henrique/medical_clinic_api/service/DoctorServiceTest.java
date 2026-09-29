@@ -97,5 +97,6 @@ class DoctorServiceTest {
                 .thenReturn(List.of(doctorMock));
 
         Assertions.assertThrows(DuplicateResourceException.class, () -> doctorService.save(doctorMock));
+        Mockito.verify(doctorRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Specification.class));
     }
 }
