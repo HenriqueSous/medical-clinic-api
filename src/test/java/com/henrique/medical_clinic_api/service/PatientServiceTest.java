@@ -65,6 +65,9 @@ class PatientServiceTest {
     @Test
     void save_SaveNewPatient_WhenCorrectDataIsProvided() {
         Patient patientMock = PatientUtil.createPatient(1, "Henrique", "12345678987");
+
+        Mockito.when(patientRepository.findByOptionalFilters(null, patientMock.getCpf()))
+                .thenReturn(List.of());
         Mockito.when(patientRepository.save(ArgumentMatchers.any(Patient.class)))
                 .thenAnswer(
                         inv -> {
