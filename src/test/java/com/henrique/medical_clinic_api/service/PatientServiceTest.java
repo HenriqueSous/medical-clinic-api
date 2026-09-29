@@ -139,7 +139,7 @@ class PatientServiceTest {
 
     @Test
     void updateByParts_ThrowsBodyEmptyException_WhenJsonNodeIsEmpty() {
-        JsonNode jsonNode = mapper.readTree("");
+        JsonNode jsonNode = mapper.createObjectNode();
 
         Assertions.assertThrows(BodyEmptyException.class, () -> patientService.updateByParts(1L, jsonNode));
         Mockito.verify(patientRepository, Mockito.never()).save(ArgumentMatchers.any(Patient.class));
