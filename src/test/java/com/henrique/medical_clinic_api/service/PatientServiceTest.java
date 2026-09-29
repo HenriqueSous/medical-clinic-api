@@ -68,7 +68,7 @@ class PatientServiceTest {
                         }
                 );
 
-        Patient patient = patientService.savePatient(patientMock);
+        Patient patient = patientService.save(patientMock);
 
         Assertions.assertNotNull(patient);
         Assertions.assertEquals(patientMock.getName(), patient.getName());
@@ -81,7 +81,8 @@ class PatientServiceTest {
         Patient patientMock = PatientUtil.createPatient(1, "Henrique", "12345678987");
         Mockito.when(patientRepository.findByOptionalFilters(null, patientMock.getCpf())).thenReturn(List.of(patientMock));
 
-        Assertions.assertThrows(DuplicateResourceException.class, () -> patientService.savePatient(patientMock));
+        Assertions.assertThrows(DuplicateResourceException.class, () -> patientService.save(patientMock));
+        Mockito.verify(patientRepository, Mockito.never()).save(ArgumentMatchers.any(Patient.class));
     }
 
     @Test
@@ -92,7 +93,7 @@ class PatientServiceTest {
         Mockito.when(patientRepository.findById(id))
                 .thenReturn(Optional.of(patientMock));
 
-        patientService.deletePatient(id);
+        patientService.delete(id);
         Mockito.verify(patientRepository, Mockito.times(1)).delete(patientMock);
         Mockito.verify(patientRepository, Mockito.times(1)).findById(id);
     }
@@ -104,8 +105,8 @@ class PatientServiceTest {
         Mockito.when(patientRepository.findById(id))
                 .thenReturn(Optional.empty());
 
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> patientService.deletePatient(id));
-        Mockito.verify(patientRepository, Mockito.times(0)).delete(ArgumentMatchers.any(Patient.class));
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> patientService.delete(id));
+        Mockito.verify(patientRepository, Mockito.never()).delete(ArgumentMatchers.any(Patient.class));
         Mockito.verify(patientRepository, Mockito.times(1)).findById(id);
     }
 }
