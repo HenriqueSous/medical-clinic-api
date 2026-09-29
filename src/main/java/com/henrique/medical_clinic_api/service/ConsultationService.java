@@ -144,7 +144,6 @@ public class ConsultationService {
     public void cancelOverdueAppointments() {
         LocalDateTime dateTimeMinusOneDay = LocalDateTime.now().minusHours(24);
 
-        // Tenho que remodelar o processor de criar query para consultas com combinações de parametros
         for (Consultation consultation : find(ConsultationQueryFilter.builder().build())) {
             LocalDateTime dateTime = LocalDateTime.of(consultation.getConsultationDate(), consultation.getConsultationTime());
             if (dateTime.isBefore(dateTimeMinusOneDay)) {
