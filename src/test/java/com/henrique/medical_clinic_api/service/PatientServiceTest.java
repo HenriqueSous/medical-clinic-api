@@ -13,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -108,5 +110,28 @@ class PatientServiceTest {
         Assertions.assertThrows(ResourceNotFoundException.class, () -> patientService.delete(id));
         Mockito.verify(patientRepository, Mockito.never()).delete(ArgumentMatchers.any(Patient.class));
         Mockito.verify(patientRepository, Mockito.times(1)).findById(id);
+    }
+
+    @Test
+    void updateByParts_UpdatePatient_WhenCorrectDataIsProvided() {
+        Patient patientMock = PatientUtil.createPatient(1L, "Henrique", "12345678987");
+        Patient update = PatientUtil.createPatient(1L, "Inara", "09876543245");
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.valueToTree(update);
+
+        Mockito.when(patientRepository.findById(1L))
+                .thenReturn(Optional.of(patientMock));
+        Mockito.when(patientRepository.save(ArgumentMatchers.any(Patient.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        Patient patientUpdated = patientService.updateByParts(1L, jsonNode);
+
+        Assertions.assertNotNull(patientUpdated);
+        Assertions.assertEquals(update.getId(), patientUpdated.getId());
+        Assertions.assertEquals(update.getName(), patientUpdated.getName());
+        Assertions.assertEquals(update.getCpf(), patientUpdated.getCpf());
+
+        Mockito.verify(patientRepository, Mockito.times(1)).save(ArgumentMatchers.any(Patient.class));
     }
 }
