@@ -146,6 +146,30 @@ class PatientServiceTest {
     }
 
     @Test
+    void updateByParts_UpdatesOnlyName_WhenOnlyNameIsProvided() {
+        Patient patientMock = PatientUtil.createPatient(1L, "Henrique", "12345678987");
+        long id = 1L;
+        String name = "Inara";
+
+        ObjectNode jsonNode = mapper.createObjectNode();
+        jsonNode.put("name", name);
+
+        Mockito.when(patientRepository.findById(1L))
+                .thenReturn(Optional.of(patientMock));
+        Mockito.when(patientRepository.save(ArgumentMatchers.any(Patient.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        Patient patientUpdated = patientService.updateByParts(1L, jsonNode);
+
+        Assertions.assertNotNull(patientUpdated);
+        Assertions.assertEquals(id, patientUpdated.getId());
+        Assertions.assertEquals(name, patientUpdated.getName());
+        Assertions.assertEquals(patientMock.getCpf(), patientUpdated.getCpf());
+
+        Mockito.verify(patientRepository, Mockito.times(1)).save(ArgumentMatchers.any(Patient.class));
+    }
+
+    @Test
     void updateByParts_ThrowsBodyEmptyException_WhenJsonNodeIsEmpty() {
         JsonNode jsonNode = mapper.createObjectNode();
 
