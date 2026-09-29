@@ -29,7 +29,7 @@ public class PatientService {
         return patientRepository.findByOptionalFilters(name, cpf);
     }
 
-    public Patient savePatient(Patient patient) {
+    public Patient save(Patient patient) {
         List<Patient> patients = findByOptionalFilters(null, patient.getCpf());
         if (!patients.isEmpty()) {
             throw new DuplicateResourceException("Patient", "CPF", patient.getCpf());
@@ -55,7 +55,7 @@ public class PatientService {
         return patientRepository.save(patient);
     }
 
-    public void deletePatient(long id) {
+    public void delete(long id) {
         Patient patient = findById(id);
         patientRepository.delete(patient);
     }

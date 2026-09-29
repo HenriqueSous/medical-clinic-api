@@ -45,7 +45,7 @@ public class PatientController {
     @PostMapping
     private ResponseEntity<PatientResponseDTO> post(@Valid @RequestBody PatientRequestDTO patientRequestDTO) {
         Patient patient = patientMapper.toEntity(patientRequestDTO);
-        PatientResponseDTO patientSaved = patientMapper.toResponse(patientService.savePatient(patient));
+        PatientResponseDTO patientSaved = patientMapper.toResponse(patientService.save(patient));
 
         return new ResponseEntity<>(patientSaved, HttpStatus.CREATED);
     }
@@ -58,7 +58,7 @@ public class PatientController {
 
     @DeleteMapping("/{id}")
     private ResponseEntity<Void> delete(@PathVariable long id) {
-        patientService.deletePatient(id);
+        patientService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
