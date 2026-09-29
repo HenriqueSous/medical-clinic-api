@@ -2,6 +2,7 @@ package com.henrique.medical_clinic_api.service;
 
 import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
+import com.henrique.medical_clinic_api.exception.validation.BodyEmptyException;
 import com.henrique.medical_clinic_api.model.Patient;
 import com.henrique.medical_clinic_api.repository.PatientRepository;
 import com.henrique.medical_clinic_api.util.PatientUtil;
@@ -26,6 +27,8 @@ class PatientServiceTest {
 
     @InjectMocks
     private PatientService patientService;
+
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Test
     void findAll_ReturnListOfAllPatients_WhenSuccessful() {
@@ -117,7 +120,6 @@ class PatientServiceTest {
         Patient patientMock = PatientUtil.createPatient(1L, "Henrique", "12345678987");
         Patient update = PatientUtil.createPatient(1L, "Inara", "09876543245");
 
-        ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.valueToTree(update);
 
         Mockito.when(patientRepository.findById(1L))
@@ -133,5 +135,14 @@ class PatientServiceTest {
         Assertions.assertEquals(update.getCpf(), patientUpdated.getCpf());
 
         Mockito.verify(patientRepository, Mockito.times(1)).save(ArgumentMatchers.any(Patient.class));
+    }
+
+    @Test
+    void updateByParts_ThrowsBodyEmptyException_WhenJsonNodeIsEmpty() {
+        JsonNode jsonNode = mapper.readTree("");
+
+        Assertions.assertThrows(BodyEmptyException.class, () -> patientService.updateByParts(1L, jsonNode));
+        Mockito.verify(patientRepository, Mockito.never()).save(ArgumentMatchers.any(Patient.class));
+        Mockito.verify(patientRepository, Mockito.never()).findById(ArgumentMatchers.any(Long.class));
     }
 }
