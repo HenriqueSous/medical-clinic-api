@@ -145,4 +145,17 @@ class PatientServiceTest {
         Mockito.verify(patientRepository, Mockito.never()).save(ArgumentMatchers.any(Patient.class));
         Mockito.verify(patientRepository, Mockito.never()).findById(ArgumentMatchers.any(Long.class));
     }
+
+    @Test
+    void updateByParts_ThrowsResourceNotFoundException_WhenPatientNotExists() {
+        Patient update = PatientUtil.createPatient(1L, "Inara", "09876543245");
+        JsonNode jsonNode = mapper.valueToTree(update);
+
+        Mockito.when(patientRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> patientService.updateByParts(1L, jsonNode));
+        Mockito.verify(patientRepository, Mockito.never()).save(ArgumentMatchers.any(Patient.class));
+        Mockito.verify(patientRepository, Mockito.times(1)).findById(ArgumentMatchers.any(Long.class));
+    }
 }
