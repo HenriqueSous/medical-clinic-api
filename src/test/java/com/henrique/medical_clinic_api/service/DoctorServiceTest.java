@@ -76,7 +76,7 @@ class DoctorServiceTest {
         Mockito.when(specialtyService.findByOptionalFilters(specialty.getName(), null))
                 .thenReturn(List.of());
         Mockito.when(doctorRepository.save(doctorMock))
-                .thenReturn(doctorMock);
+                .thenAnswer(inv -> inv.getArgument(0));
 
         Doctor doctorSaved = doctorService.save(doctorMock);
 
