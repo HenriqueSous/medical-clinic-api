@@ -80,6 +80,7 @@ class DoctorServiceTest {
                 .thenAnswer(inv -> inv.getArgument(0));
 
         Doctor doctorSaved = doctorService.save(doctorMock);
+        Specialty specialtySaved = doctorMock.getSpecialties().getFirst();
 
         Assertions.assertNotNull(doctorSaved);
         Assertions.assertEquals(doctorMock.getId(), doctorSaved.getId());
@@ -87,6 +88,8 @@ class DoctorServiceTest {
         Assertions.assertEquals(doctorMock.getCrm(), doctorSaved.getCrm());
         Assertions.assertEquals(doctorMock.getUf(), doctorSaved.getUf());
         Assertions.assertEquals(doctorMock.getSpecialties(), doctorSaved.getSpecialties());
+        Assertions.assertEquals(1, specialtySaved.getDoctors().size());
+        Assertions.assertTrue(specialtySaved.getDoctors().contains(doctorMock));
     }
 
     @Test
