@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -125,5 +126,36 @@ class DoctorServiceTest {
         Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.delete(id));
         Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
         Mockito.verify(doctorRepository, Mockito.never()).delete(ArgumentMatchers.any(Doctor.class));
+    }
+
+    @Test
+    void findSpecialties_ReturnListOfSpecialties_WhenDoctorExists() {
+        long id = 1L;
+        Specialty specialty = new Specialty(1L, "Neurologista", "Descrição", new ArrayList<>());
+        Doctor doctorMock = DoctorUtil.createDoctor(id, "Henrique", "12345", "BA", specialty);
+        specialty.getDoctors().add(doctorMock);
+
+        Mockito.when(doctorRepository.findById(id))
+                .thenReturn(Optional.of(doctorMock));
+
+        List<Specialty> specialties = doctorService.findSpecialties(id);
+        Specialty first = specialties.getFirst();
+
+        Assertions.assertNotNull(specialties);
+        Assertions.assertEquals(1, specialties.size());
+        Assertions.assertEquals(1, first.getDoctors().size());
+        Assertions.assertEquals(doctorMock, first.getDoctors().getFirst());
+        Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
+    }
+
+    @Test
+    void findSpecialties_ThrowsResourceNotFoundException_WhenDoctorNotExists() {
+        long id = 1L;
+
+        Mockito.when(doctorRepository.findById(id))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.findSpecialties(id));
+        Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
     }
 }
