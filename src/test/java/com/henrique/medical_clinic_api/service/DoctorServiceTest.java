@@ -42,6 +42,7 @@ class DoctorServiceTest {
 
         Assertions.assertNotNull(doctors);
         Assertions.assertEquals(1, doctors.size());
+        Mockito.verify(doctorRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Specification.class));
     }
 
     @Test
@@ -57,6 +58,7 @@ class DoctorServiceTest {
         Assertions.assertEquals(doctorMock.getName(), doctor.getName());
         Assertions.assertEquals(doctorMock.getCrm(), doctor.getCrm());
         Assertions.assertEquals(doctorMock.getUf(), doctor.getUf());
+        Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
     }
 
     @Test
@@ -65,6 +67,7 @@ class DoctorServiceTest {
         Mockito.when(doctorRepository.findById(id)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.findById(id));
+        Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
     }
 
     @Test
@@ -90,6 +93,8 @@ class DoctorServiceTest {
         Assertions.assertEquals(doctorMock.getSpecialties(), doctorSaved.getSpecialties());
         Assertions.assertEquals(1, specialtySaved.getDoctors().size());
         Assertions.assertTrue(specialtySaved.getDoctors().contains(doctorMock));
+        Mockito.verify(doctorRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Specification.class));
+        Mockito.verify(doctorRepository, Mockito.times(1)).save(doctorMock);
     }
 
     @Test
@@ -102,6 +107,7 @@ class DoctorServiceTest {
 
         Assertions.assertThrows(DuplicateResourceException.class, () -> doctorService.save(doctorMock));
         Mockito.verify(doctorRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Specification.class));
+        Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
     }
 
     @Test
