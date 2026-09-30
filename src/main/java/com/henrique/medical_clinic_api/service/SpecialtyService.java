@@ -1,6 +1,6 @@
 package com.henrique.medical_clinic_api.service;
 
-import com.henrique.medical_clinic_api.exception.domain.SpecialtyAlreadyExistsException;
+import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
@@ -32,7 +32,7 @@ public class SpecialtyService {
     public Specialty save(Specialty specialty) {
         List<Specialty> specialties = findByOptionalFilters(specialty.getName(), null);
         if (!specialties.isEmpty()) {
-            throw new SpecialtyAlreadyExistsException(specialty.getName());
+            throw new DuplicateResourceException("Specialty", "name", specialty.getName());
         }
         return specialtyRepository.save(specialty);
     }
