@@ -99,4 +99,19 @@ class DoctorServiceTest {
         Assertions.assertThrows(DuplicateResourceException.class, () -> doctorService.save(doctorMock));
         Mockito.verify(doctorRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Specification.class));
     }
+
+    @Test
+    void delete_deleteDoctor_WhenDoctorExists() {
+        long id = 1L;
+        Doctor doctorMock = DoctorUtil.createDoctor(id, "Henrique", "12345", "BA");
+
+        Mockito.when(doctorRepository.findById(id))
+                .thenReturn(Optional.of(doctorMock));
+        Mockito.doNothing()
+                .when(doctorRepository).delete(doctorMock);
+
+        doctorService.delete(id);
+        Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
+        Mockito.verify(doctorRepository, Mockito.times(1)).delete(doctorMock);
+    }
 }
