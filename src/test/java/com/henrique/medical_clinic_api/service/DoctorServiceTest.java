@@ -114,4 +114,16 @@ class DoctorServiceTest {
         Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
         Mockito.verify(doctorRepository, Mockito.times(1)).delete(doctorMock);
     }
+
+    @Test
+    void delete_ThrowsResourceNotFoundException_WhenDoctorNotExists() {
+        long id = 1L;
+
+        Mockito.when(doctorRepository.findById(id))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.delete(id));
+        Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
+        Mockito.verify(doctorRepository, Mockito.never()).delete(ArgumentMatchers.any(Doctor.class));
+    }
 }
