@@ -19,8 +19,6 @@ public interface SpecialtyMapper {
 
     SpecialtySummaryDTO toSummary(Specialty specialty);
 
-    List<Specialty> toEntityList(List<SpecialtyRequestDtO> specialtyRequestDtOList);
-
     List<SpecialtyResponseDTO> toResponseList(List<Specialty> specialties);
 
     List<SpecialtySummaryDTO> toSummaryList(List<Specialty> specialties);
