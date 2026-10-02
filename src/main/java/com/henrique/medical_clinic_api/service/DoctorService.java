@@ -2,6 +2,7 @@ package com.henrique.medical_clinic_api.service;
 
 import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
+import com.henrique.medical_clinic_api.exception.validation.ImmutableFieldException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.queryFilters.DoctorQueryFilter;
@@ -71,17 +72,12 @@ public class DoctorService {
     public Doctor updateByParts(long id, JsonNode jsonNode) {
         Doctor doctor = findById(id);
 
+        if (jsonNode.has("crm") || jsonNode.has("uf")) {
+            throw new ImmutableFieldException("CRM and UF cannot be changed after doctor creation");
+        }
         if (jsonNode.has("name")) {
             String name = jsonNode.get("name").asString();
             doctor.setName(name);
-        }
-        if (jsonNode.has("crm")) {
-            String crm = jsonNode.get("crm").asString();
-            doctor.setCrm(crm);
-        }
-        if (jsonNode.has("uf")) {
-            String uf = jsonNode.get("uf").asString();
-            doctor.setUf(uf);
         }
         if (jsonNode.has("specialties")) {
             JsonNode specialties = jsonNode.path("specialties");

@@ -26,10 +26,10 @@ public class Doctor {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, updatable = false, length = 10)
     private String crm;
 
-    @Column(nullable = false, length = 2)
+    @Column(nullable = false, updatable = false, length = 2)
     private String uf;
 
     @CreationTimestamp
