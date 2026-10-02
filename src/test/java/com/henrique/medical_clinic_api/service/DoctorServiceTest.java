@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,8 @@ class DoctorServiceTest {
 
     @InjectMocks
     private DoctorService doctorService;
+
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Test
     void findAll_ReturnListOfAllDoctors_WhenSuccessful() {
@@ -140,7 +143,7 @@ class DoctorServiceTest {
     @Test
     void findSpecialties_ReturnListOfSpecialties_WhenDoctorExists() {
         long id = 1L;
-        Specialty specialty = new Specialty(1L, "Neurologista", "Descrição", new ArrayList<>());
+        Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Neurologista", "Descrição");
         Doctor doctorMock = DoctorUtil.createDoctor(id, "Henrique", "12345", "BA", specialty);
         specialty.getDoctors().add(doctorMock);
 
