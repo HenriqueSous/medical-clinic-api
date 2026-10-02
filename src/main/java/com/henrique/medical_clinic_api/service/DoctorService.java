@@ -108,6 +108,7 @@ public class DoctorService {
                     Specialty specialty = specialtyList.getFirst();
 
                     doctor.getSpecialties().remove(specialty);
+                    specialty.getDoctors().remove(doctor);
                 }
             }
         }
