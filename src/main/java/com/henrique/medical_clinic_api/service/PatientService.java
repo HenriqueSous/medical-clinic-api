@@ -3,6 +3,7 @@ package com.henrique.medical_clinic_api.service;
 import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.exception.validation.BodyEmptyException;
+import com.henrique.medical_clinic_api.exception.validation.ImmutableFieldException;
 import com.henrique.medical_clinic_api.model.Patient;
 import com.henrique.medical_clinic_api.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,15 +42,15 @@ public class PatientService {
     @Transactional
     public Patient updateByParts(long id, JsonNode jsonNode) {
         if (jsonNode.isEmpty()) throw new BodyEmptyException();
-        Patient patient = findById(id);
 
+        if (jsonNode.has("cpf")) {
+            throw new ImmutableFieldException("CPF cannot be changed after patient creation");
+        }
+
+        Patient patient = findById(id);
         if (jsonNode.has("name")) {
             String name = jsonNode.get("name").asString();
             patient.setName(name);
-        }
-        if (jsonNode.has("cpf")) {
-            String cpf = jsonNode.get("cpf").asString();
-            patient.setCpf(cpf);
         }
 
         return patientRepository.save(patient);

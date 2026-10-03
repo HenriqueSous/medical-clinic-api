@@ -23,7 +23,7 @@ public class Patient {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 11)
+    @Column(nullable = false, unique = true, updatable = false, length = 11)
     private String cpf;
 
     @CreationTimestamp
