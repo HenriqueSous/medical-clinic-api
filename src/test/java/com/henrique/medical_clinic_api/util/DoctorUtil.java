@@ -14,7 +14,8 @@ public class DoctorUtil {
     }
 
     public static Doctor createDoctor(long id, String name, String crm, String uf, Specialty... specialties) {
-        return new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>(), Arrays.asList(specialties));
+        return new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(),
+                new ArrayList<>(), new ArrayList<>(Arrays.asList(specialties)));
     }
 
     public static List<Doctor> listOfDoctors() {
