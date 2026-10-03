@@ -3,6 +3,7 @@ package com.henrique.medical_clinic_api.service;
 import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.exception.validation.BodyEmptyException;
+import com.henrique.medical_clinic_api.exception.validation.ImmutableFieldException;
 import com.henrique.medical_clinic_api.model.Patient;
 import com.henrique.medical_clinic_api.repository.PatientRepository;
 import com.henrique.medical_clinic_api.util.PatientUtil;
@@ -124,32 +125,6 @@ class PatientServiceTest {
         Patient patientMock = PatientUtil.createPatient(1L, "Henrique", "12345678987");
         long id = 1L;
         String name = "Inara";
-        String cpf = "09876543245";
-
-        ObjectNode jsonNode = mapper.createObjectNode();
-        jsonNode.put("name", name);
-        jsonNode.put("cpf", cpf);
-
-        Mockito.when(patientRepository.findById(1L))
-                .thenReturn(Optional.of(patientMock));
-        Mockito.when(patientRepository.save(ArgumentMatchers.any(Patient.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
-
-        Patient patientUpdated = patientService.updateByParts(1L, jsonNode);
-
-        Assertions.assertNotNull(patientUpdated);
-        Assertions.assertEquals(id, patientUpdated.getId());
-        Assertions.assertEquals(name, patientUpdated.getName());
-        Assertions.assertEquals(cpf, patientUpdated.getCpf());
-
-        Mockito.verify(patientRepository, Mockito.times(1)).save(ArgumentMatchers.any(Patient.class));
-    }
-
-    @Test
-    void updateByParts_UpdatesOnlyName_WhenOnlyNameIsProvided() {
-        Patient patientMock = PatientUtil.createPatient(1L, "Henrique", "12345678987");
-        long id = 1L;
-        String name = "Inara";
 
         ObjectNode jsonNode = mapper.createObjectNode();
         jsonNode.put("name", name);
@@ -164,33 +139,18 @@ class PatientServiceTest {
         Assertions.assertNotNull(patientUpdated);
         Assertions.assertEquals(id, patientUpdated.getId());
         Assertions.assertEquals(name, patientUpdated.getName());
-        Assertions.assertEquals(patientMock.getCpf(), patientUpdated.getCpf());
-
         Mockito.verify(patientRepository, Mockito.times(1)).save(ArgumentMatchers.any(Patient.class));
     }
 
     @Test
-    void updateByParts_UpdatesOnlyCpf_WhenOnlyCpfIsProvided() {
-        Patient patientMock = PatientUtil.createPatient(1L, "Henrique", "12345678987");
-        long id = 1L;
+    void updateByParts_ThrowsImmutableFieldException_WhenCpfIsProvided() {
         String cpf = "94537856381";
 
         ObjectNode jsonNode = mapper.createObjectNode();
         jsonNode.put("cpf", cpf);
 
-        Mockito.when(patientRepository.findById(1L))
-                .thenReturn(Optional.of(patientMock));
-        Mockito.when(patientRepository.save(ArgumentMatchers.any(Patient.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
-
-        Patient patientUpdated = patientService.updateByParts(1L, jsonNode);
-
-        Assertions.assertNotNull(patientUpdated);
-        Assertions.assertEquals(id, patientUpdated.getId());
-        Assertions.assertEquals(patientMock.getName(), patientUpdated.getName());
-        Assertions.assertEquals(cpf, patientUpdated.getCpf());
-
-        Mockito.verify(patientRepository, Mockito.times(1)).save(ArgumentMatchers.any(Patient.class));
+        Assertions.assertThrows(ImmutableFieldException.class, () -> patientService.updateByParts(1L, jsonNode));
+        Mockito.verify(patientRepository, Mockito.never()).save(ArgumentMatchers.any(Patient.class));
     }
 
     @Test
@@ -204,8 +164,8 @@ class PatientServiceTest {
 
     @Test
     void updateByParts_ThrowsResourceNotFoundException_WhenPatientNotExists() {
-        Patient update = PatientUtil.createPatient(1L, "Inara", "09876543245");
-        JsonNode jsonNode = mapper.valueToTree(update);
+        ObjectNode jsonNode = mapper.createObjectNode();
+        jsonNode.put("name", "Inara");
 
         Mockito.when(patientRepository.findById(1L))
                 .thenReturn(Optional.empty());
