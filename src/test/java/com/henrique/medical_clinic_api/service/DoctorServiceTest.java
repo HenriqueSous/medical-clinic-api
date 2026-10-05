@@ -253,7 +253,6 @@ class DoctorServiceTest {
 
         jsonNodeRoot.set("specialties", jsonNodeSpe);
 
-
         Mockito.when(doctorRepository.findById(doctorId))
                 .thenReturn(Optional.of(doctorMock));
         Mockito.when(specialtyService.findByOptionalFilters("Neurologista", null))
@@ -273,6 +272,43 @@ class DoctorServiceTest {
         Assertions.assertTrue(doctorUpdated.getSpecialties().contains(specialtyNeuro));
         Assertions.assertTrue(doctorUpdated.getSpecialties().contains(specialtyCardio));
         Assertions.assertFalse(doctorUpdated.getSpecialties().contains(specialtyOrto));
+        Assertions.assertEquals(2, doctorUpdated.getSpecialties().size());
+
+        Mockito.verify(doctorRepository, Mockito.times(1)).findById(doctorId);
+        Mockito.verify(doctorRepository, Mockito.times(1)).save(ArgumentMatchers.any(Doctor.class));
+    }
+
+    @Test
+    void updateByParts_UpdateOnlyDoctorName_WhenSpecialtiesIsNotProvided() {
+        Specialty specialtyCardio = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
+        Specialty specialtyOrto = SpecialtyUtil.createSpecialty(2L, "Ortopedista", "Descrição ortopedista");
+
+        long doctorId = 1L;
+        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", specialtyCardio, specialtyOrto);
+        specialtyCardio.setDoctors(new ArrayList<>(List.of(doctorMock)));
+        specialtyOrto.setDoctors(new ArrayList<>(List.of(doctorMock)));
+
+        ObjectNode jsonNodeRoot = mapper.createObjectNode();
+        jsonNodeRoot.put("name", "Inara");
+        System.out.println(jsonNodeRoot);
+
+        Mockito.when(doctorRepository.findById(doctorId))
+                .thenReturn(Optional.of(doctorMock));
+        Mockito.when(doctorRepository.save(ArgumentMatchers.any(Doctor.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        Doctor doctorUpdated = doctorService.updateByParts(doctorId, jsonNodeRoot);
+        for (Specialty specialty : doctorUpdated.getSpecialties()) {
+            System.out.println(specialty.getName());
+        }
+
+        Assertions.assertNotNull(doctorUpdated);
+        Assertions.assertEquals(doctorId, doctorUpdated.getId());
+        Assertions.assertEquals(doctorMock.getName(), doctorUpdated.getName());
+        Assertions.assertEquals(doctorMock.getCrm(), doctorUpdated.getCrm());
+        Assertions.assertEquals(doctorMock.getUf(), doctorUpdated.getUf());
+        Assertions.assertTrue(doctorUpdated.getSpecialties().contains(specialtyCardio));
+        Assertions.assertTrue(doctorUpdated.getSpecialties().contains(specialtyOrto));
         Assertions.assertEquals(2, doctorUpdated.getSpecialties().size());
 
         Mockito.verify(doctorRepository, Mockito.times(1)).findById(doctorId);
