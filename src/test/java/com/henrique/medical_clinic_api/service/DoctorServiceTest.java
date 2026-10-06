@@ -290,7 +290,6 @@ class DoctorServiceTest {
 
         ObjectNode jsonNodeRoot = mapper.createObjectNode();
         jsonNodeRoot.put("name", "Inara");
-        System.out.println(jsonNodeRoot);
 
         Mockito.when(doctorRepository.findById(doctorId))
                 .thenReturn(Optional.of(doctorMock));
@@ -298,9 +297,6 @@ class DoctorServiceTest {
                 .thenAnswer(inv -> inv.getArgument(0));
 
         Doctor doctorUpdated = doctorService.updateByParts(doctorId, jsonNodeRoot);
-        for (Specialty specialty : doctorUpdated.getSpecialties()) {
-            System.out.println(specialty.getName());
-        }
 
         Assertions.assertNotNull(doctorUpdated);
         Assertions.assertEquals(doctorId, doctorUpdated.getId());
@@ -313,5 +309,63 @@ class DoctorServiceTest {
 
         Mockito.verify(doctorRepository, Mockito.times(1)).findById(doctorId);
         Mockito.verify(doctorRepository, Mockito.times(1)).save(ArgumentMatchers.any(Doctor.class));
+    }
+
+    @Test
+    void updateByParts_ThrowsResourceNotFoundException_WhenSpecialtyToAddNotExists() {
+        Specialty specialtyCardio = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
+
+        long doctorId = 1L;
+        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", specialtyCardio);
+        specialtyCardio.setDoctors(new ArrayList<>(List.of(doctorMock)));
+
+        ObjectNode jsonNodeRoot = mapper.createObjectNode();
+        ObjectNode jsonNodeSpe = mapper.createObjectNode();
+
+        ArrayNode arrayNodeAdd = mapper.createArrayNode();
+        arrayNodeAdd.add("Neurologista");
+
+        jsonNodeSpe.set("add", arrayNodeAdd);
+
+        jsonNodeRoot.set("specialties", jsonNodeSpe);
+
+        Mockito.when(doctorRepository.findById(doctorId))
+                .thenReturn(Optional.of(doctorMock));
+        Mockito.when(specialtyService.findByOptionalFilters("Neurologista", null))
+                .thenReturn(List.of());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.updateByParts(doctorId, jsonNodeRoot));
+
+        Mockito.verify(doctorRepository, Mockito.times(1)).findById(doctorId);
+        Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
+    }
+
+    @Test
+    void updateByParts_ThrowsResourceNotFoundException_WhenSpecialtyToRemoveNotExists() {
+        Specialty specialtyCardio = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
+
+        long doctorId = 1L;
+        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", specialtyCardio);
+        specialtyCardio.setDoctors(new ArrayList<>(List.of(doctorMock)));
+
+        ObjectNode jsonNodeRoot = mapper.createObjectNode();
+        ObjectNode jsonNodeSpe = mapper.createObjectNode();
+
+        ArrayNode arrayNodeAdd = mapper.createArrayNode();
+        arrayNodeAdd.add("Neurologista");
+
+        jsonNodeSpe.set("remove", arrayNodeAdd);
+
+        jsonNodeRoot.set("specialties", jsonNodeSpe);
+
+        Mockito.when(doctorRepository.findById(doctorId))
+                .thenReturn(Optional.of(doctorMock));
+        Mockito.when(specialtyService.findByOptionalFilters("Neurologista", null))
+                .thenReturn(List.of());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.updateByParts(doctorId, jsonNodeRoot));
+
+        Mockito.verify(doctorRepository, Mockito.times(1)).findById(doctorId);
+        Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
     }
 }
