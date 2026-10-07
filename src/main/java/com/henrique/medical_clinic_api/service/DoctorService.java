@@ -57,10 +57,7 @@ public class DoctorService {
 
                 specialtiesToBeSaved.add(specialtyByName);
             } else {
-                if (!specialtiesToBeSaved.contains(specialty)) {
-                    specialty.getDoctors().add(doctor);
-                    specialtiesToBeSaved.add(specialty);
-                }
+                throw new ResourceNotFoundException("Specialty with name '" + specialty.getName() + "' not found");
             }
         }
 
