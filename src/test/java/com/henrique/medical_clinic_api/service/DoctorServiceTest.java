@@ -2,6 +2,7 @@ package com.henrique.medical_clinic_api.service;
 
 import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
+import com.henrique.medical_clinic_api.exception.validation.ImmutableFieldException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.queryFilters.DoctorQueryFilter;
@@ -446,5 +447,39 @@ class DoctorServiceTest {
 
         Mockito.verify(doctorRepository, Mockito.times(1)).findById(doctorId);
         Mockito.verify(doctorRepository, Mockito.times(1)).save(ArgumentMatchers.any(Doctor.class));
+    }
+
+    @Test
+    void updateByParts_ThrowsImmutableFieldException_WhenCrmIsProvided() {
+        long doctorId = 1L;
+        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA");
+
+        ObjectNode jsonNodeRoot = mapper.createObjectNode();
+        jsonNodeRoot.put("crm", "09876");
+
+        Mockito.when(doctorRepository.findById(doctorId))
+                .thenReturn(Optional.of(doctorMock));
+
+        Assertions.assertThrows(ImmutableFieldException.class, () -> doctorService.updateByParts(doctorId, jsonNodeRoot));
+
+        Mockito.verify(doctorRepository, Mockito.times(1)).findById(doctorId);
+        Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
+    }
+
+    @Test
+    void updateByParts_ThrowsImmutableFieldException_WhenUfIsProvided() {
+        long doctorId = 1L;
+        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA");
+
+        ObjectNode jsonNodeRoot = mapper.createObjectNode();
+        jsonNodeRoot.put("uf", "CE");
+
+        Mockito.when(doctorRepository.findById(doctorId))
+                .thenReturn(Optional.of(doctorMock));
+
+        Assertions.assertThrows(ImmutableFieldException.class, () -> doctorService.updateByParts(doctorId, jsonNodeRoot));
+
+        Mockito.verify(doctorRepository, Mockito.times(1)).findById(doctorId);
+        Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
     }
 }
