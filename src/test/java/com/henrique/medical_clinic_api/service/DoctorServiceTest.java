@@ -236,6 +236,7 @@ class DoctorServiceTest {
         Assertions.assertTrue(doctorUpdated.getSpecialties().contains(specialtyNeuro));
         Assertions.assertTrue(doctorUpdated.getSpecialties().contains(specialtyCardio));
         Assertions.assertFalse(doctorUpdated.getSpecialties().contains(specialtyOrto));
+        Assertions.assertFalse(specialtyOrto.getDoctors().contains(doctorMock));
         Assertions.assertEquals(2, doctorUpdated.getSpecialties().size());
 
         Mockito.verify(doctorRepository, Mockito.times(1)).findById(doctorId);
