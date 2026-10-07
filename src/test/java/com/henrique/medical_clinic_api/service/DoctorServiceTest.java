@@ -131,6 +131,20 @@ class DoctorServiceTest {
     }
 
     @Test
+    void save_ThrowsResourceNotFoundException_WhenSpecialtyNotExists() {
+        Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Clínico Geral", "Descrição");
+        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", specialty);
+
+        Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
+                .thenReturn(List.of());
+        Mockito.when(specialtyService.findByOptionalFilters(specialty.getName(), null))
+                .thenReturn(List.of());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.save(doctorMock));
+        Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
+    }
+
+    @Test
     void delete_deleteDoctor_WhenDoctorExists() {
         long id = 1L;
         Doctor doctorMock = DoctorUtil.createDoctor(id, "Henrique", "12345", "BA");
