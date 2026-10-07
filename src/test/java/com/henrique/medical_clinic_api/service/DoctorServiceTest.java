@@ -84,7 +84,7 @@ class DoctorServiceTest {
         Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
                 .thenReturn(List.of());
         Mockito.when(specialtyService.findByOptionalFilters(specialty.getName(), null))
-                .thenReturn(List.of());
+                .thenReturn(List.of(specialty));
         Mockito.when(doctorRepository.save(doctorMock))
                 .thenAnswer(inv -> inv.getArgument(0));
 
