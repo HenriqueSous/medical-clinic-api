@@ -13,14 +13,39 @@ public class DoctorUtil {
         return new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>(), List.of());
     }
 
-    public static Doctor createDoctor(long id, String name, String crm, String uf, Specialty... specialties) {
-        return new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(),
-                new ArrayList<>(), new ArrayList<>(Arrays.asList(specialties)));
+    public static Doctor createDoctor(long id, String name, String crm, String uf, boolean linkSpecialties, Specialty... specialties) {
+        Doctor doctor = new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(),
+                new ArrayList<>(), new ArrayList<>());
+
+        if (linkSpecialties) {
+            linkDoctorToSpecialties(doctor, specialties);
+        } else {
+            doctor.setSpecialties(Arrays.asList(specialties));
+        }
+
+        return doctor;
     }
 
     public static List<Doctor> listOfDoctors() {
         return List.of(
                 createDoctor(1, "Henrique", "12345", "BA")
         );
+    }
+
+    private static void linkDoctorToSpecialties(Doctor doctor, Specialty... specialties) {
+        List<Specialty> doctorSpecialties = doctor.getSpecialties();
+
+        for (Specialty specialty : specialties) {
+            List<Doctor> specialtyDoctors = specialty.getDoctors();
+
+            if (!doctorSpecialties.contains(specialty)) {
+                doctorSpecialties.add(specialty);
+            }
+            if (!specialtyDoctors.contains(doctor)) {
+                specialtyDoctors.add(doctor);
+                specialty.setDoctors(specialtyDoctors);
+            }
+        }
+        doctor.setSpecialties(doctorSpecialties);
     }
 }
