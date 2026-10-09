@@ -22,7 +22,6 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,7 +78,7 @@ class DoctorServiceTest {
     @Test
     void save_SaveNewDoctor_WhenCorrectDataIsProvided() {
         Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Clínico Geral", "Descrição");
-        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", specialty);
+        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", false, specialty);
 
         Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
                 .thenReturn(List.of());
@@ -119,7 +118,7 @@ class DoctorServiceTest {
     @Test
     void save_ThrowsDuplicateResourceException_WhenSpecialtyServiceReturnDuplicateSpecialties() {
         Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Clínico Geral", "Descrição");
-        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", specialty);
+        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", false, specialty);
 
         Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
                 .thenReturn(List.of());
@@ -133,7 +132,7 @@ class DoctorServiceTest {
     @Test
     void save_ThrowsResourceNotFoundException_WhenSpecialtyNotExists() {
         Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Clínico Geral", "Descrição");
-        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", specialty);
+        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", false, specialty);
 
         Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
                 .thenReturn(List.of());
@@ -175,8 +174,7 @@ class DoctorServiceTest {
     void findSpecialties_ReturnListOfSpecialties_WhenDoctorExists() {
         long id = 1L;
         Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Neurologista", "Descrição");
-        Doctor doctorMock = DoctorUtil.createDoctor(id, "Henrique", "12345", "BA", specialty);
-        specialty.getDoctors().add(doctorMock);
+        Doctor doctorMock = DoctorUtil.createDoctor(id, "Henrique", "12345", "BA", true, specialty);
 
         Mockito.when(doctorRepository.findById(id))
                 .thenReturn(Optional.of(doctorMock));
@@ -209,9 +207,7 @@ class DoctorServiceTest {
         Specialty specialtyNeuro = SpecialtyUtil.createSpecialty(3L, "Neurologista", "Descrição neurologista");
 
         long doctorId = 1L;
-        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", specialtyCardio, specialtyOrto);
-        specialtyCardio.setDoctors(new ArrayList<>(List.of(doctorMock)));
-        specialtyOrto.setDoctors(new ArrayList<>(List.of(doctorMock)));
+        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", true, specialtyCardio, specialtyOrto);
         String newName = "Inara";
 
         ObjectNode jsonNodeRoot = mapper.createObjectNode();
@@ -264,9 +260,7 @@ class DoctorServiceTest {
         Specialty specialtyNeuro = SpecialtyUtil.createSpecialty(3L, "Neurologista", "Descrição neurologista");
 
         long doctorId = 1L;
-        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", specialtyCardio, specialtyOrto);
-        specialtyCardio.setDoctors(new ArrayList<>(List.of(doctorMock)));
-        specialtyOrto.setDoctors(new ArrayList<>(List.of(doctorMock)));
+        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", true, specialtyCardio, specialtyOrto);
 
         ObjectNode jsonNodeRoot = mapper.createObjectNode();
 
@@ -314,9 +308,7 @@ class DoctorServiceTest {
         Specialty specialtyOrto = SpecialtyUtil.createSpecialty(2L, "Ortopedista", "Descrição ortopedista");
 
         long doctorId = 1L;
-        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", specialtyCardio, specialtyOrto);
-        specialtyCardio.setDoctors(new ArrayList<>(List.of(doctorMock)));
-        specialtyOrto.setDoctors(new ArrayList<>(List.of(doctorMock)));
+        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", true, specialtyCardio, specialtyOrto);
 
         ObjectNode jsonNodeRoot = mapper.createObjectNode();
         jsonNodeRoot.put("name", "Inara");
@@ -346,8 +338,7 @@ class DoctorServiceTest {
         Specialty specialtyCardio = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
 
         long doctorId = 1L;
-        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", specialtyCardio);
-        specialtyCardio.setDoctors(new ArrayList<>(List.of(doctorMock)));
+        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", true, specialtyCardio);
 
         ObjectNode jsonNodeRoot = mapper.createObjectNode();
         ObjectNode jsonNodeSpe = mapper.createObjectNode();
@@ -375,8 +366,7 @@ class DoctorServiceTest {
         Specialty specialtyCardio = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
 
         long doctorId = 1L;
-        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", specialtyCardio);
-        specialtyCardio.setDoctors(new ArrayList<>(List.of(doctorMock)));
+        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", true, specialtyCardio);
 
         ObjectNode jsonNodeRoot = mapper.createObjectNode();
         ObjectNode jsonNodeSpe = mapper.createObjectNode();
@@ -405,8 +395,7 @@ class DoctorServiceTest {
         Specialty specialtyNeuro = SpecialtyUtil.createSpecialty(3L, "Neurologista", "Descrição neurologista");
 
         long doctorId = 1L;
-        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", specialtyCardio);
-        specialtyCardio.setDoctors(new ArrayList<>(List.of(doctorMock)));
+        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", true, specialtyCardio);
 
         ObjectNode jsonNodeRoot = mapper.createObjectNode();
         ObjectNode jsonNodesSpe = mapper.createObjectNode();
@@ -444,9 +433,7 @@ class DoctorServiceTest {
         Specialty specialtyNeuro = SpecialtyUtil.createSpecialty(3L, "Neurologista", "Descrição neurologista");
 
         long doctorId = 1L;
-        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", specialtyCardio, specialtyNeuro);
-        specialtyCardio.setDoctors(new ArrayList<>(List.of(doctorMock)));
-        specialtyNeuro.setDoctors(new ArrayList<>(List.of(doctorMock)));
+        Doctor doctorMock = DoctorUtil.createDoctor(doctorId, "Henrique", "12345", "BA", true, specialtyCardio, specialtyNeuro);
 
         ObjectNode jsonNodeRoot = mapper.createObjectNode();
         ObjectNode jsonNodesSpe = mapper.createObjectNode();
