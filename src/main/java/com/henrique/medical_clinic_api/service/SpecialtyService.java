@@ -40,7 +40,7 @@ public class SpecialtyService {
         return specialtyRepository.findByOptionalFilters(name, description);
     }
 
-    public Specialty updateInParts(long id, JsonNode jsonNode) {
+    public Specialty updateByParts(long id, JsonNode jsonNode) {
         Specialty specialty = findById(id);
 
         if (jsonNode.has("description")) {

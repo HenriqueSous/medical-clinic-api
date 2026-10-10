@@ -57,7 +57,7 @@ public class SpecialtyController {
 
     @PatchMapping("/{id}")
     private ResponseEntity<SpecialtyResponseDTO> patch(@PathVariable long id, @RequestBody JsonNode jsonNode) {
-        return ResponseEntity.ok(specialtyMapper.toResponse(specialtyService.updateInParts(id, jsonNode)));
+        return ResponseEntity.ok(specialtyMapper.toResponse(specialtyService.updateByParts(id, jsonNode)));
     }
 
     @DeleteMapping("/{id}")
