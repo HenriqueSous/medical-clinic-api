@@ -15,6 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +28,8 @@ class SpecialtyServiceTest {
 
     @Mock
     private SpecialtyRepository specialtyRepository;
+
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Test
     void findAll_ReturnListOfSpecialties_WhenSuccessful() {
@@ -130,6 +134,42 @@ class SpecialtyServiceTest {
 
         Assertions.assertThrows(DuplicateResourceException.class, () -> specialtyService.save(specialtyMock));
         Mockito.verify(specialtyRepository, Mockito.times(1)).findByOptionalFilters(specialtyMock.getName(), null);
+        Mockito.verify(specialtyRepository, Mockito.never()).save(ArgumentMatchers.any(Specialty.class));
+    }
+
+    @Test
+    void updateInParts_updateSpecialty_WhenCorrectDataIsProvided() {
+        long id = 1L;
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(id, "Cardiologista", "Descrição Cardiologista");
+        String newDescription = "nova descrição Cardiologista";
+
+        Mockito.when(specialtyRepository.findById(id))
+                .thenReturn(Optional.of(specialtyMock));
+        Mockito.when(specialtyRepository.save(ArgumentMatchers.any(Specialty.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        ObjectNode jsonNode = mapper.createObjectNode();
+        jsonNode.put("description", newDescription);
+
+        Specialty specialtyUpdated = specialtyService.updateInParts(id, jsonNode);
+        Assertions.assertNotNull(specialtyUpdated);
+        Assertions.assertEquals(id, specialtyUpdated.getId());
+        Assertions.assertEquals(specialtyMock.getName(), specialtyUpdated.getName());
+        Assertions.assertEquals(newDescription, specialtyUpdated.getDescription());
+
+        Mockito.verify(specialtyRepository, Mockito.times(1)).findById(id);
+        Mockito.verify(specialtyRepository, Mockito.times(1)).save(specialtyMock);
+    }
+
+    @Test
+    void updateInParts_ThrowsResourceNotFoundException_WhenSpecialtyIsNotFound() {
+        long id = 1L;
+
+        Mockito.when(specialtyRepository.findById(id))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> specialtyService.updateInParts(id, mapper.createObjectNode()));
+        Mockito.verify(specialtyRepository, Mockito.times(1)).findById(id);
         Mockito.verify(specialtyRepository, Mockito.never()).save(ArgumentMatchers.any(Specialty.class));
     }
 }
