@@ -1,5 +1,6 @@
 package com.henrique.medical_clinic_api.service;
 
+import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
@@ -97,5 +98,38 @@ class SpecialtyServiceTest {
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> specialtyService.findDoctors(specialtyId));
         Mockito.verify(specialtyRepository, Mockito.times(1)).findById(specialtyId);
+    }
+
+    @Test
+    void save_SaveNewSpecialty_WhenCorrectDataIsProvided() {
+        long specialtyId = 1L;
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(specialtyId, "Cardiologista", "Descrição Cardiiologista");
+
+        Mockito.when(specialtyRepository.findByOptionalFilters(specialtyMock.getName(), null))
+                .thenReturn(List.of());
+        Mockito.when(specialtyRepository.save(ArgumentMatchers.any(Specialty.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        Specialty savedSpecialty = specialtyService.save(specialtyMock);
+        Assertions.assertNotNull(savedSpecialty);
+        Assertions.assertEquals(specialtyId, savedSpecialty.getId());
+        Assertions.assertEquals(specialtyMock.getDescription(), savedSpecialty.getDescription());
+        Assertions.assertEquals(specialtyMock.getDoctors(), savedSpecialty.getDoctors());
+
+        Mockito.verify(specialtyRepository, Mockito.times(1)).findByOptionalFilters(specialtyMock.getName(), null);
+        Mockito.verify(specialtyRepository, Mockito.times(1)).save(specialtyMock);
+    }
+
+    @Test
+    void save_ThrowsDuplicateResourceException_WhenSpecialtyAlreadyExists() {
+        long specialtyId = 1L;
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(specialtyId, "Cardiologista", "Descrição Cardiiologista");
+
+        Mockito.when(specialtyRepository.findByOptionalFilters(specialtyMock.getName(), null))
+                .thenReturn(List.of(specialtyMock));
+
+        Assertions.assertThrows(DuplicateResourceException.class, () -> specialtyService.save(specialtyMock));
+        Mockito.verify(specialtyRepository, Mockito.times(1)).findByOptionalFilters(specialtyMock.getName(), null);
+        Mockito.verify(specialtyRepository, Mockito.never()).save(ArgumentMatchers.any(Specialty.class));
     }
 }
