@@ -2,6 +2,8 @@ package com.henrique.medical_clinic_api.service;
 
 import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
+import com.henrique.medical_clinic_api.exception.validation.BodyEmptyException;
+import com.henrique.medical_clinic_api.exception.validation.ImmutableFieldException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.repository.SpecialtyRepository;
@@ -41,8 +43,12 @@ public class SpecialtyService {
     }
 
     public Specialty updateByParts(long id, JsonNode jsonNode) {
+        if (jsonNode.isEmpty()) throw new BodyEmptyException();
         Specialty specialty = findById(id);
 
+        if (jsonNode.has("name")) {
+            throw new ImmutableFieldException("name cannot be changed after specialty creation");
+        }
         if (jsonNode.has("description")) {
             String description = jsonNode.get("description").asString();
             specialty.setDescription(description);
