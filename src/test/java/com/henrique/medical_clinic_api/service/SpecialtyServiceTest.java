@@ -9,6 +9,7 @@ import com.henrique.medical_clinic_api.util.SpecialtyUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -53,6 +54,7 @@ class SpecialtyServiceTest {
         Assertions.assertEquals(id, specialtyFound.getId());
         Assertions.assertEquals(specialtyMock.getName(), specialtyFound.getName());
         Assertions.assertEquals(specialtyMock.getDescription(), specialtyFound.getDescription());
+        Assertions.assertEquals(specialtyMock.getDoctors(), specialtyFound.getDoctors());
         Mockito.verify(specialtyRepository, Mockito.times(1)).findById(id);
     }
 
