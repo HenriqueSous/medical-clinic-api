@@ -25,8 +25,7 @@ public class SpecialtyService {
     }
 
     public List<Doctor> findDoctors(long id) {
-        Specialty specialty = findById(id);
-        return specialty.getDoctors();
+        return findById(id).getDoctors();
     }
 
     public Specialty save(Specialty specialty) {
