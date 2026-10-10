@@ -1,8 +1,10 @@
 package com.henrique.medical_clinic_api.service;
 
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
+import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.repository.SpecialtyRepository;
+import com.henrique.medical_clinic_api.util.DoctorUtil;
 import com.henrique.medical_clinic_api.util.SpecialtyUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -63,5 +65,35 @@ class SpecialtyServiceTest {
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> specialtyService.findById(id));
         Mockito.verify(specialtyRepository, Mockito.times(1)).findById(id);
+    }
+
+    @Test
+    void findDoctors_ReturnListOfDoctors_WhenSuccessful() {
+        long specialtyId = 1L;
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(specialtyId, "Cardiologista", "Descrição Cardiiologista");
+        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", true, specialtyMock);
+
+        Mockito.when(specialtyRepository.findById(specialtyId))
+                .thenReturn(Optional.of(specialtyMock));
+
+        List<Doctor> doctors = specialtyService.findDoctors(specialtyId);
+        Doctor first = doctors.getFirst();
+
+        Assertions.assertNotNull(doctors);
+        Assertions.assertEquals(1, doctors.size());
+        Assertions.assertEquals(doctorMock, first);
+        Assertions.assertEquals(specialtyMock, first.getSpecialties().getFirst());
+        Mockito.verify(specialtyRepository, Mockito.times(1)).findById(specialtyId);
+    }
+
+    @Test
+    void findDoctors_ThrowsResourceNotFoundException_WhenIdIsNotFound() {
+        long specialtyId = 1L;
+
+        Mockito.when(specialtyRepository.findById(specialtyId))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> specialtyService.findDoctors(specialtyId));
+        Mockito.verify(specialtyRepository, Mockito.times(1)).findById(specialtyId);
     }
 }
