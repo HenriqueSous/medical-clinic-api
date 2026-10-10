@@ -172,4 +172,31 @@ class SpecialtyServiceTest {
         Mockito.verify(specialtyRepository, Mockito.times(1)).findById(id);
         Mockito.verify(specialtyRepository, Mockito.never()).save(ArgumentMatchers.any(Specialty.class));
     }
+
+    @Test
+    void delete_DeleteSpecialty_WhenSpecialtyIsFound() {
+        long id = 1L;
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(id, "Cardiologista", "Descrição Cardiologista");
+
+        Mockito.when(specialtyRepository.findById(id))
+                .thenReturn(Optional.of(specialtyMock));
+        Mockito.doNothing()
+                .when(specialtyRepository).delete(specialtyMock);
+
+        specialtyService.delete(id);
+        Mockito.verify(specialtyRepository, Mockito.times(1)).findById(id);
+        Mockito.verify(specialtyRepository, Mockito.times(1)).delete(specialtyMock);
+    }
+
+    @Test
+    void delete_ThrowsResourceNotFoundException_WhenSpecialtyIsNotFound() {
+        long id = 1L;
+
+        Mockito.when(specialtyRepository.findById(id))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> specialtyService.delete(id));
+        Mockito.verify(specialtyRepository, Mockito.times(1)).findById(id);
+        Mockito.verify(specialtyRepository, Mockito.never()).delete(ArgumentMatchers.any(Specialty.class));
+    }
 }
