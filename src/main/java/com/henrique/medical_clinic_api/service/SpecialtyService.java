@@ -59,6 +59,11 @@ public class SpecialtyService {
 
     public void delete(long id) {
         Specialty specialty = findById(id);
+
+        for (Doctor doctor : specialty.getDoctors()) {
+            doctor.getSpecialties().remove(specialty);
+        }
+
         specialtyRepository.delete(specialty);
     }
 }
