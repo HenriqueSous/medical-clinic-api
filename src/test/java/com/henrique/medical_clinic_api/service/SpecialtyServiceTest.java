@@ -2,6 +2,8 @@ package com.henrique.medical_clinic_api.service;
 
 import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
+import com.henrique.medical_clinic_api.exception.validation.BodyEmptyException;
+import com.henrique.medical_clinic_api.exception.validation.ImmutableFieldException;
 import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Specialty;
 import com.henrique.medical_clinic_api.repository.SpecialtyRepository;
@@ -154,11 +156,39 @@ class SpecialtyServiceTest {
         Specialty specialtyUpdated = specialtyService.updateByParts(id, jsonNode);
         Assertions.assertNotNull(specialtyUpdated);
         Assertions.assertEquals(id, specialtyUpdated.getId());
-        Assertions.assertEquals(specialtyMock.getName(), specialtyUpdated.getName());
+        Assertions.assertEquals(originalName, specialtyUpdated.getName());
         Assertions.assertEquals(newDescription, specialtyUpdated.getDescription());
 
         Mockito.verify(specialtyRepository, Mockito.times(1)).findById(id);
         Mockito.verify(specialtyRepository, Mockito.times(1)).save(specialtyMock);
+    }
+
+    @Test
+    void updateByParts_ThrowsImmutableFieldException_WhenNameIsProvided() {
+        long id = 1L;
+        String originalName = "Cardiologista";
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(id, originalName, "Descrição Cardiologista");
+
+        Mockito.when(specialtyRepository.findById(id))
+                .thenReturn(Optional.of(specialtyMock));
+
+        ObjectNode jsonNode = mapper.createObjectNode();
+        jsonNode.put("name", "Neuro");
+
+        Assertions.assertThrows(ImmutableFieldException.class, () -> specialtyService.updateByParts(id, jsonNode));
+
+        Mockito.verify(specialtyRepository, Mockito.times(1)).findById(id);
+        Mockito.verify(specialtyRepository, Mockito.never()).save(ArgumentMatchers.any(Specialty.class));
+    }
+
+    @Test
+    void updateByParts_ThrowsBodyEmptyException_WhenBodyIsEmpty() {
+        long id = 1L;
+
+        Assertions.assertThrows(BodyEmptyException.class, () -> specialtyService.updateByParts(id, mapper.createObjectNode()));
+
+        Mockito.verify(specialtyRepository, Mockito.never()).findById(id);
+        Mockito.verify(specialtyRepository, Mockito.never()).save(ArgumentMatchers.any(Specialty.class));
     }
 
     @Test
