@@ -198,7 +198,10 @@ class SpecialtyServiceTest {
         Mockito.when(specialtyRepository.findById(id))
                 .thenReturn(Optional.empty());
 
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> specialtyService.updateByParts(id, mapper.createObjectNode()));
+        ObjectNode jsonNode = mapper.createObjectNode();
+        jsonNode.put("description", "test");
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> specialtyService.updateByParts(id, jsonNode));
         Mockito.verify(specialtyRepository, Mockito.times(1)).findById(id);
         Mockito.verify(specialtyRepository, Mockito.never()).save(ArgumentMatchers.any(Specialty.class));
     }
