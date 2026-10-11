@@ -108,17 +108,22 @@ class SpecialtyServiceTest {
 
     @Test
     void save_SaveNewSpecialty_WhenCorrectDataIsProvided() {
-        long specialtyId = 1L;
-        Specialty specialtyMock = SpecialtyUtil.createSpecialty(specialtyId, "Cardiologista", "Descrição Cardiiologista");
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição Cardiiologista");
 
         Mockito.when(specialtyRepository.findByOptionalFilters(specialtyMock.getName(), null))
                 .thenReturn(List.of());
         Mockito.when(specialtyRepository.save(ArgumentMatchers.any(Specialty.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
+                .thenAnswer(
+                        inv -> {
+                            Specialty specialty = inv.getArgument(0);
+                            specialty.setId(10L);
+                            return specialty;
+                        }
+                );
 
         Specialty savedSpecialty = specialtyService.save(specialtyMock);
         Assertions.assertNotNull(savedSpecialty);
-        Assertions.assertEquals(specialtyId, savedSpecialty.getId());
+        Assertions.assertEquals(10L, savedSpecialty.getId());
         Assertions.assertEquals(specialtyMock.getDescription(), savedSpecialty.getDescription());
         Assertions.assertEquals(specialtyMock.getDoctors(), savedSpecialty.getDoctors());
 
@@ -142,8 +147,9 @@ class SpecialtyServiceTest {
     @Test
     void updateByParts_updateSpecialty_WhenCorrectDataIsProvided() {
         long id = 1L;
-        Specialty specialtyMock = SpecialtyUtil.createSpecialty(id, "Cardiologista", "Descrição Cardiologista");
+        String originalName = "Cardiologista";
         String newDescription = "nova descrição Cardiologista";
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(id, originalName, "Descrição Cardiologista");
 
         Mockito.when(specialtyRepository.findById(id))
                 .thenReturn(Optional.of(specialtyMock));
