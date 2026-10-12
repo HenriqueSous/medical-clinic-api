@@ -1,0 +1,18 @@
+package com.henrique.medical_clinic_api.util;
+
+import com.henrique.medical_clinic_api.model.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+public class ConsultationUtil {
+    public static Consultation createConsultation(long id) {
+        Patient patient = PatientUtil.createPatient(1L, "Henrique", "12345678909");
+        Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
+        Doctor doctor = DoctorUtil.createDoctor(1L, "Pedro", "12345", "BA", true, specialty);
+
+        return new Consultation(id, patient, doctor, LocalDate.of(2026, 9, 24),
+                LocalTime.of(15, 30), 30, ConsultationStatus.SCHEDULED, LocalDateTime.now(), LocalDateTime.now());
+    }
+}
