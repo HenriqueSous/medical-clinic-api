@@ -35,7 +35,7 @@ class SpecialtyServiceTest {
 
     @Test
     void findAll_ReturnListOfSpecialties_WhenSuccessful() {
-        Specialty specialtyMock = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição Cardiiologista");
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição Cardiologista");
 
         Mockito.when(specialtyRepository.findAll())
                 .thenReturn(List.of(specialtyMock));
@@ -50,7 +50,7 @@ class SpecialtyServiceTest {
     @Test
     void findById_ReturnSpecialty_WhenIdIsFound() {
         long id = 1L;
-        Specialty specialtyMock = SpecialtyUtil.createSpecialty(id, "Cardiologista", "Descrição Cardiiologista");
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(id, "Cardiologista", "Descrição Cardiologista");
 
         Mockito.when(specialtyRepository.findById(id))
                 .thenReturn(Optional.of(specialtyMock));
@@ -79,7 +79,7 @@ class SpecialtyServiceTest {
     @Test
     void findDoctors_ReturnListOfDoctors_WhenSuccessful() {
         long specialtyId = 1L;
-        Specialty specialtyMock = SpecialtyUtil.createSpecialty(specialtyId, "Cardiologista", "Descrição Cardiiologista");
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(specialtyId, "Cardiologista", "Descrição Cardiologista");
         Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", true, specialtyMock);
 
         Mockito.when(specialtyRepository.findById(specialtyId))
@@ -108,7 +108,7 @@ class SpecialtyServiceTest {
 
     @Test
     void save_SaveNewSpecialty_WhenCorrectDataIsProvided() {
-        Specialty specialtyMock = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição Cardiiologista");
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição Cardiologista");
 
         Mockito.when(specialtyRepository.findByOptionalFilters(specialtyMock.getName(), null))
                 .thenReturn(List.of());
@@ -134,7 +134,7 @@ class SpecialtyServiceTest {
     @Test
     void save_ThrowsDuplicateResourceException_WhenSpecialtyAlreadyExists() {
         long specialtyId = 1L;
-        Specialty specialtyMock = SpecialtyUtil.createSpecialty(specialtyId, "Cardiologista", "Descrição Cardiiologista");
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(specialtyId, "Cardiologista", "Descrição Cardiologista");
 
         Mockito.when(specialtyRepository.findByOptionalFilters(specialtyMock.getName(), null))
                 .thenReturn(List.of(specialtyMock));
