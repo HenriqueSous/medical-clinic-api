@@ -1,17 +1,23 @@
 package com.henrique.medical_clinic_api.service;
 
+import com.henrique.medical_clinic_api.dto.consultation.ConsultationRequestDTO;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
-import com.henrique.medical_clinic_api.model.Consultation;
+import com.henrique.medical_clinic_api.mapper.ConsultationMapper;
+import com.henrique.medical_clinic_api.model.*;
 import com.henrique.medical_clinic_api.repository.ConsultationRepository;
 import com.henrique.medical_clinic_api.util.ConsultationUtil;
+import com.henrique.medical_clinic_api.util.DoctorUtil;
+import com.henrique.medical_clinic_api.util.PatientUtil;
+import com.henrique.medical_clinic_api.util.SpecialtyUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +33,9 @@ class ConsultationServiceTest {
 
     @Mock
     private PatientService patientService;
+
+    @Captor
+    private ArgumentCaptor<Consultation> consultationCaptor;
 
     @Test
     void findById_ReturnConsultation_WhenConsultationExists() {
@@ -49,5 +58,44 @@ class ConsultationServiceTest {
                 .thenReturn(Optional.empty());
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> consultationService.findById(1L));
+    }
+
+    @Test
+    void save_SaveNewConsultation_WhenCorrectDataIsProvided() {
+        Patient patientMock = PatientUtil.createPatient(1L, "Henrique", "12345678909");
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
+        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Pedro", "12345", "BA", true, specialtyMock);
+        ConsultationUtil.setDoctorConsultations(doctorMock);
+
+        ReflectionTestUtils.setField(consultationService, "consultationMapper", ConsultationMapper.INSTANCE);
+        Mockito.when(doctorService.findById(1L))
+                .thenReturn(doctorMock);
+        Mockito.when(patientService.findById(1L))
+                .thenReturn(patientMock);
+        Mockito.when(consultationRepository.save(consultationCaptor.capture()))
+                .thenAnswer(
+                        inv -> {
+                            Consultation c = inv.getArgument(0);
+                            c.setId(10L);
+                            return c;
+                        }
+                );
+
+        ConsultationRequestDTO consultationRequestDTO = new ConsultationRequestDTO(1L, 1L,
+                LocalDate.of(2026, 9, 24), LocalTime.of(16, 50), 30);
+        Consultation saved = consultationService.save(consultationRequestDTO);
+
+        Consultation consultationCaptured = consultationCaptor.getValue();
+
+        Assertions.assertNotNull(saved);
+        Assertions.assertEquals(10L, consultationCaptured.getId());
+        Assertions.assertEquals(patientMock, consultationCaptured.getPatient());
+        Assertions.assertEquals(doctorMock, consultationCaptured.getDoctor());
+        Assertions.assertEquals(consultationRequestDTO.consultationDate(), consultationCaptured.getConsultationDate());
+        Assertions.assertEquals(consultationRequestDTO.consultationTime(), consultationCaptured.getConsultationTime());
+        Assertions.assertEquals(consultationRequestDTO.duration(), consultationCaptured.getDuration());
+        Assertions.assertEquals(ConsultationStatus.SCHEDULED, consultationCaptured.getStatus());
+
+        Mockito.verify(consultationRepository, Mockito.times(1)).save(consultationCaptured);
     }
 }

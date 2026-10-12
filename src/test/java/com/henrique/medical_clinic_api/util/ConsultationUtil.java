@@ -15,4 +15,21 @@ public class ConsultationUtil {
         return new Consultation(id, patient, doctor, LocalDate.of(2026, 9, 24),
                 LocalTime.of(15, 30), 30, ConsultationStatus.SCHEDULED, LocalDateTime.now(), LocalDateTime.now());
     }
+
+    public static Consultation createConsultation(long id, Patient patient, Doctor doctor, LocalDateTime consultationDataTime) {
+        return new Consultation(id, patient, doctor, consultationDataTime.toLocalDate(), consultationDataTime.toLocalTime(),
+                30, ConsultationStatus.SCHEDULED, LocalDateTime.now(), LocalDateTime.now());
+    }
+
+    public static void setDoctorConsultations(Doctor doctor) {
+        Patient patient1 = PatientUtil.createPatient(2L, "Inara", "09876543212");
+        Patient patient2 = PatientUtil.createPatient(3L, "Daniel", "09887543212");
+
+        doctor.getConsultations().add(
+            createConsultation(1L, patient1, doctor, LocalDateTime.of(2026, 9, 24, 16, 10))
+        );
+        doctor.getConsultations().add(
+                createConsultation(1L, patient2, doctor, LocalDateTime.of(2026, 9, 25, 10, 0))
+        );
+    }
 }
