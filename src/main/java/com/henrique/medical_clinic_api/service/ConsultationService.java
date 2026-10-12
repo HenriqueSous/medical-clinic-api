@@ -85,7 +85,7 @@ public class ConsultationService {
     }
 
     @Transactional
-    public Consultation updateInParts(long id, JsonNode jsonNode) {
+    public Consultation updateByParts(long id, JsonNode jsonNode) {
         Consultation consultation = findById(id);
 
         if (jsonNode.has("consultationDate")) {

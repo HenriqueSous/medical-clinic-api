@@ -40,7 +40,7 @@ public class ConsultationController {
 
     @PatchMapping("/{id}")
     private ResponseEntity<ConsultationResponseDTO> patch(@PathVariable long id, @RequestBody JsonNode jsonNode) {
-        return ResponseEntity.ok(consultationMapper.toResponse(consultationService.updateInParts(id, jsonNode)));
+        return ResponseEntity.ok(consultationMapper.toResponse(consultationService.updateByParts(id, jsonNode)));
     }
 
     @DeleteMapping("/{id}")
