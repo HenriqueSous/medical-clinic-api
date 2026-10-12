@@ -1,6 +1,8 @@
 package com.henrique.medical_clinic_api.service;
 
 import com.henrique.medical_clinic_api.dto.consultation.ConsultationRequestDTO;
+import com.henrique.medical_clinic_api.exception.domain.DoctorScheduleConflictException;
+import com.henrique.medical_clinic_api.exception.domain.DuplicateAppointmentDateException;
 import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.mapper.ConsultationMapper;
 import com.henrique.medical_clinic_api.model.*;
@@ -14,10 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -97,5 +102,132 @@ class ConsultationServiceTest {
         Assertions.assertEquals(ConsultationStatus.SCHEDULED, consultationCaptured.getStatus());
 
         Mockito.verify(consultationRepository, Mockito.times(1)).save(consultationCaptured);
+    }
+
+    @Test
+    void save_ThrowsDoctorScheduleConflictException_WhenNewConsultationOverlapsExistingOne() {
+        Patient patientMock = PatientUtil.createPatient(1L, "Henrique", "12345678909");
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
+        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Pedro", "12345", "BA", true, specialtyMock);
+        ConsultationUtil.setDoctorConsultations(doctorMock);
+
+        ReflectionTestUtils.setField(consultationService, "consultationMapper", ConsultationMapper.INSTANCE);
+        Mockito.when(doctorService.findById(1L))
+                .thenReturn(doctorMock);
+        Mockito.when(patientService.findById(1L))
+                .thenReturn(patientMock);
+
+        ConsultationRequestDTO consultationRequestDTO = new ConsultationRequestDTO(1L, 1L,
+                LocalDate.of(2026, 9, 24), LocalTime.of(16, 10), 30);
+
+        Assertions.assertThrows(DoctorScheduleConflictException.class, () -> consultationService.save(consultationRequestDTO));
+
+        Mockito.verify(consultationRepository, Mockito.never()).save(ArgumentMatchers.any(Consultation.class));
+    }
+
+    @Test
+    void save_SaveNewConsultation_WhenStartsExactlyWhenPreviousEnds() {
+        Patient patientMock = PatientUtil.createPatient(1L, "Henrique", "12345678909");
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
+        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Pedro", "12345", "BA", true, specialtyMock);
+        ConsultationUtil.setDoctorConsultations(doctorMock);
+
+        ReflectionTestUtils.setField(consultationService, "consultationMapper", ConsultationMapper.INSTANCE);
+        Mockito.when(doctorService.findById(1L))
+                .thenReturn(doctorMock);
+        Mockito.when(patientService.findById(1L))
+                .thenReturn(patientMock);
+        Mockito.when(consultationRepository.save(consultationCaptor.capture()))
+                .thenAnswer(
+                        inv -> {
+                            Consultation c = inv.getArgument(0);
+                            c.setId(10L);
+                            return c;
+                        }
+                );
+
+        ConsultationRequestDTO consultationRequestDTO = new ConsultationRequestDTO(1L, 1L,
+                LocalDate.of(2026, 9, 24), LocalTime.of(16, 40), 30);
+        Consultation saved = consultationService.save(consultationRequestDTO);
+
+        Consultation consultationCaptured = consultationCaptor.getValue();
+
+        Assertions.assertNotNull(saved);
+        Assertions.assertEquals(10L, consultationCaptured.getId());
+        Assertions.assertEquals(patientMock, consultationCaptured.getPatient());
+        Assertions.assertEquals(doctorMock, consultationCaptured.getDoctor());
+        Assertions.assertEquals(consultationRequestDTO.consultationDate(), consultationCaptured.getConsultationDate());
+        Assertions.assertEquals(consultationRequestDTO.consultationTime(), consultationCaptured.getConsultationTime());
+        Assertions.assertEquals(consultationRequestDTO.duration(), consultationCaptured.getDuration());
+        Assertions.assertEquals(ConsultationStatus.SCHEDULED, consultationCaptured.getStatus());
+
+        Mockito.verify(consultationRepository, Mockito.times(1)).save(consultationCaptured);
+    }
+
+    @Test
+    void save_UsesDefaultDuration_WhenDurationIsNull() {
+        Patient patientMock = PatientUtil.createPatient(1L, "Henrique", "12345678909");
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
+        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Pedro", "12345", "BA", true, specialtyMock);
+        ConsultationUtil.setDoctorConsultations(doctorMock);
+
+        ReflectionTestUtils.setField(consultationService, "consultationMapper", ConsultationMapper.INSTANCE);
+        Mockito.when(doctorService.findById(1L))
+                .thenReturn(doctorMock);
+        Mockito.when(patientService.findById(1L))
+                .thenReturn(patientMock);
+        Mockito.when(consultationRepository.save(consultationCaptor.capture()))
+                .thenAnswer(
+                        inv -> {
+                            Consultation c = inv.getArgument(0);
+                            c.setId(10L);
+                            return c;
+                        }
+                );
+
+        ConsultationRequestDTO consultationRequestDTO = new ConsultationRequestDTO(1L, 1L,
+                LocalDate.of(2026, 9, 24), LocalTime.of(16, 50), null);
+        Consultation saved = consultationService.save(consultationRequestDTO);
+
+        Consultation consultationCaptured = consultationCaptor.getValue();
+
+        Assertions.assertNotNull(saved);
+        Assertions.assertEquals(10L, consultationCaptured.getId());
+        Assertions.assertEquals(patientMock, consultationCaptured.getPatient());
+        Assertions.assertEquals(doctorMock, consultationCaptured.getDoctor());
+        Assertions.assertEquals(consultationRequestDTO.consultationDate(), consultationCaptured.getConsultationDate());
+        Assertions.assertEquals(consultationRequestDTO.consultationTime(), consultationCaptured.getConsultationTime());
+        Assertions.assertEquals(30, consultationCaptured.getDuration());
+        Assertions.assertEquals(ConsultationStatus.SCHEDULED, consultationCaptured.getStatus());
+
+        Mockito.verify(consultationRepository, Mockito.times(1)).save(consultationCaptured);
+    }
+
+    @Test
+    void save_ThrowsDuplicateAppointmentDateException_WhenPatientAlreadyHasAppointmentForTheDay() {
+        Patient patientMock = PatientUtil.createPatient(1L, "Henrique", "12345678909");
+        Specialty specialtyMock = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
+        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Pedro", "12345", "BA", true, specialtyMock);
+        ConsultationUtil.setDoctorConsultations(doctorMock);
+
+        ReflectionTestUtils.setField(consultationService, "consultationMapper", ConsultationMapper.INSTANCE);
+        Mockito.when(doctorService.findById(1L))
+                .thenReturn(doctorMock);
+        Mockito.when(patientService.findById(1L))
+                .thenReturn(patientMock);
+        Mockito.when(consultationRepository.findAll(ArgumentMatchers.any(Specification.class)))
+                .thenReturn(List.of(ConsultationUtil.createConsultation(
+                        5L,
+                        patientMock,
+                        doctorMock,
+                        LocalDateTime.of(2026, 10, 13, 9, 20)
+                )));
+
+        ConsultationRequestDTO consultationRequestDTO = new ConsultationRequestDTO(1L, 1L,
+                LocalDate.of(2026, 9, 24), LocalTime.of(16, 10), 30);
+
+        Assertions.assertThrows(DuplicateAppointmentDateException.class, () -> consultationService.save(consultationRequestDTO));
+
+        Mockito.verify(consultationRepository, Mockito.never()).save(ArgumentMatchers.any(Consultation.class));
     }
 }
