@@ -97,7 +97,7 @@ public class ConsultationService {
             consultation.setConsultationTime(consultationTime);
         }
         if (jsonNode.has("duration")) {
-            int duration = checkDuration(jsonNode.get("consultationTime").asInt());
+            int duration = checkDuration(jsonNode.get("duration").asInt());
             consultation.setDuration(duration);
         }
         if (jsonNode.has("status")) {
