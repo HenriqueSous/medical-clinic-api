@@ -112,23 +112,32 @@ public class ConsultationService {
         LocalDateTime dateTimePlus = dateTime.plusMinutes(duration);
 
         for (Consultation consultation : doctor.getConsultations()) {
-            LocalDateTime dateTimeScheduled = LocalDateTime.of(consultation.getConsultationDate(), consultation.getConsultationTime());
-            LocalDateTime dateTimeScheduledPlus = dateTimeScheduled.plusMinutes(duration);
+            if (consultation.getStatus() != ConsultationStatus.CANCELED) {
+                LocalDateTime scheduledDateTime = LocalDateTime.of(consultation.getConsultationDate(), consultation.getConsultationTime());
+                LocalDateTime scheduledDateTimePlus = scheduledDateTime.plusMinutes(consultation.getDuration());
 
-            if (dateTime.isAfter(dateTimeScheduled) && dateTime.isBefore(dateTimeScheduledPlus)||
-            dateTimePlus.isAfter(dateTimeScheduled) && dateTimePlus.isBefore(dateTimeScheduledPlus)) {
-                throw new DoctorScheduleConflictException(doctor.getId(), dateTime);
+                if (
+                        dateTime.isAfter(scheduledDateTime) && dateTime.isBefore(scheduledDateTimePlus) ||
+                        dateTimePlus.isAfter(scheduledDateTime) && dateTimePlus.isBefore(scheduledDateTimePlus) ||
+                        dateTime.isBefore(scheduledDateTime) && dateTimePlus.isAfter(scheduledDateTimePlus) ||
+                        dateTime.equals(scheduledDateTime) ||
+                        dateTimePlus.equals(scheduledDateTimePlus)
+                ) {
+                    throw new DoctorScheduleConflictException(doctor.getId(), dateTime);
+                }
             }
         }
     }
 
-    private boolean checkExistingAppointment(long patientId, LocalDate date) {
+    private void checkExistingAppointment(long patientId, LocalDate date) {
         ConsultationQueryFilter filterPatientConsultationDate = ConsultationQueryFilter.builder()
                 .patientId(patientId)
                 .consultationDate(date)
                 .build();
 
-        return !find(filterPatientConsultationDate).isEmpty();
+        if (!find(filterPatientConsultationDate).isEmpty()) {
+            throw new DuplicateAppointmentDateException(patientId, date);
+        }
     }
 
     private int checkDuration(Integer duration) {
