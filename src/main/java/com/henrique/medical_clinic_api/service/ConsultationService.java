@@ -12,7 +12,6 @@ import com.henrique.medical_clinic_api.model.Doctor;
 import com.henrique.medical_clinic_api.model.Patient;
 import com.henrique.medical_clinic_api.queryFilters.ConsultationQueryFilter;
 import com.henrique.medical_clinic_api.repository.ConsultationRepository;
-import com.henrique.medical_clinic_api.repository.specification.ConsultationSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
