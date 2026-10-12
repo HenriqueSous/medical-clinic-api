@@ -41,7 +41,7 @@ public class Consultation {
 
     @Column(nullable = false)
     @ColumnDefault("30")
-    @Min(10)
+    @Min(15)
     private Integer duration;
 
     @Enumerated(EnumType.STRING)
