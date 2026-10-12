@@ -55,20 +55,15 @@ public class ConsultationService {
         Doctor doctor = doctorService.findById(doctorId);
         Patient patient = patientService.findById(patientId);
 
-        int duration = consultationRequestDTO.duration();
+        int duration = checkDuration(consultationRequestDTO.duration());
+        Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
+        checkExistingAppointment(patientId, consultation.getConsultationDate());
 
         checkDoctorSchedule(
                 doctor,
                 LocalDateTime.of(consultationRequestDTO.consultationDate(), consultationRequestDTO.consultationTime()),
                 duration
         );
-
-        Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
-
-        LocalDate consultationDate = consultation.getConsultationDate();
-        if (checkExistingAppointment(patientId, consultationDate)) {
-            throw new DuplicateAppointmentDateException(patientId, consultationDate);
-        }
 
         consultation.setDoctor(doctor);
         consultation.setPatient(patient);
