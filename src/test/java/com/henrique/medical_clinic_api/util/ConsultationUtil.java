@@ -23,13 +23,9 @@ public class ConsultationUtil {
 
     public static void setDoctorConsultations(Doctor doctor) {
         Patient patient1 = PatientUtil.createPatient(2L, "Inara", "09876543212");
-        Patient patient2 = PatientUtil.createPatient(3L, "Daniel", "09887543212");
 
         doctor.getConsultations().add(
             createConsultation(1L, patient1, doctor, LocalDateTime.of(2026, 9, 24, 16, 10))
-        );
-        doctor.getConsultations().add(
-                createConsultation(2L, patient2, doctor, LocalDateTime.of(2026, 9, 25, 10, 0))
         );
     }
 }
