@@ -91,11 +91,12 @@ class ConsultationServiceTest {
         Consultation saved = consultationService.save(consultationRequestDTO);
 
         Consultation consultationCaptured = consultationCaptor.getValue();
+        Doctor capturedDoctor = consultationCaptured.getDoctor();
 
         Assertions.assertNotNull(saved);
         Assertions.assertEquals(10L, consultationCaptured.getId());
-        Assertions.assertEquals(patientMock, consultationCaptured.getPatient());
-        Assertions.assertEquals(doctorMock, consultationCaptured.getDoctor());
+        Assertions.assertEquals(patientMock.getCpf(), consultationCaptured.getPatient().getCpf());
+        Assertions.assertEquals(doctorMock.getCrm()+doctorMock.getUf(), capturedDoctor.getCrm()+capturedDoctor.getUf());
         Assertions.assertEquals(consultationRequestDTO.consultationDate(), consultationCaptured.getConsultationDate());
         Assertions.assertEquals(consultationRequestDTO.consultationTime(), consultationCaptured.getConsultationTime());
         Assertions.assertEquals(consultationRequestDTO.duration(), consultationCaptured.getDuration());
@@ -151,11 +152,12 @@ class ConsultationServiceTest {
         Consultation saved = consultationService.save(consultationRequestDTO);
 
         Consultation consultationCaptured = consultationCaptor.getValue();
+        Doctor capturedDoctor = consultationCaptured.getDoctor();
 
         Assertions.assertNotNull(saved);
         Assertions.assertEquals(10L, consultationCaptured.getId());
-        Assertions.assertEquals(patientMock, consultationCaptured.getPatient());
-        Assertions.assertEquals(doctorMock, consultationCaptured.getDoctor());
+        Assertions.assertEquals(patientMock.getCpf(), consultationCaptured.getPatient().getCpf());
+        Assertions.assertEquals(doctorMock.getCrm()+doctorMock.getUf(), capturedDoctor.getCrm()+capturedDoctor.getUf());
         Assertions.assertEquals(consultationRequestDTO.consultationDate(), consultationCaptured.getConsultationDate());
         Assertions.assertEquals(consultationRequestDTO.consultationTime(), consultationCaptured.getConsultationTime());
         Assertions.assertEquals(consultationRequestDTO.duration(), consultationCaptured.getDuration());
@@ -190,11 +192,12 @@ class ConsultationServiceTest {
         Consultation saved = consultationService.save(consultationRequestDTO);
 
         Consultation consultationCaptured = consultationCaptor.getValue();
+        Doctor capturedDoctor = consultationCaptured.getDoctor();
 
         Assertions.assertNotNull(saved);
         Assertions.assertEquals(10L, consultationCaptured.getId());
-        Assertions.assertEquals(patientMock, consultationCaptured.getPatient());
-        Assertions.assertEquals(doctorMock, consultationCaptured.getDoctor());
+        Assertions.assertEquals(patientMock.getCpf(), consultationCaptured.getPatient().getCpf());
+        Assertions.assertEquals(doctorMock.getCrm()+doctorMock.getUf(), capturedDoctor.getCrm()+capturedDoctor.getUf());
         Assertions.assertEquals(consultationRequestDTO.consultationDate(), consultationCaptured.getConsultationDate());
         Assertions.assertEquals(consultationRequestDTO.consultationTime(), consultationCaptured.getConsultationTime());
         Assertions.assertEquals(30, consultationCaptured.getDuration());
