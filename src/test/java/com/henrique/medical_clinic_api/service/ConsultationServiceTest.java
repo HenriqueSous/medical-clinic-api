@@ -14,6 +14,8 @@ import com.henrique.medical_clinic_api.util.SpecialtyUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
@@ -105,8 +107,18 @@ class ConsultationServiceTest {
         Mockito.verify(consultationRepository, Mockito.times(1)).save(consultationCaptured);
     }
 
-    @Test
-    void save_ThrowsDoctorScheduleConflictException_WhenNewConsultationOverlapsExistingOne() {
+    @ParameterizedTest
+    @CsvSource(
+            value = {
+                    "16:10;30",
+                    "16:30;30",
+                    "15:50;30",
+                    "16:00;50",
+                    "16:00;40",
+            },
+            delimiter = ';'
+    )
+    void save_ThrowsDoctorScheduleConflictException_WhenNewConsultationOverlapsExistingOne(LocalTime localTime, int duration) {
         Patient patientMock = PatientUtil.createPatient(1L, "Henrique", "12345678909");
         Specialty specialtyMock = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
         Doctor doctorMock = DoctorUtil.createDoctor(1L, "Pedro", "12345", "BA", true, specialtyMock);
@@ -118,10 +130,10 @@ class ConsultationServiceTest {
         Mockito.when(patientService.findById(1L))
                 .thenReturn(patientMock);
 
-        ConsultationRequestDTO consultationRequestDTO = new ConsultationRequestDTO(1L, 1L,
-                LocalDate.of(2026, 9, 24), LocalTime.of(16, 10), 30);
-
-        Assertions.assertThrows(DoctorScheduleConflictException.class, () -> consultationService.save(consultationRequestDTO));
+        Assertions.assertThrows(DoctorScheduleConflictException.class, () -> consultationService.save(
+                new ConsultationRequestDTO(1L, 1L,
+                        LocalDate.of(2026, 9, 24), localTime, duration)
+        ));
 
         Mockito.verify(consultationRepository, Mockito.never()).save(ArgumentMatchers.any(Consultation.class));
     }
