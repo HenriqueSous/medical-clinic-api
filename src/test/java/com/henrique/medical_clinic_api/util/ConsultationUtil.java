@@ -7,13 +7,20 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class ConsultationUtil {
-    public static Consultation createConsultation(long id) {
+    public static Consultation createConsultation(long id, boolean linkPatientDoctor) {
         Patient patient = PatientUtil.createPatient(1L, "Henrique", "12345678909");
         Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
         Doctor doctor = DoctorUtil.createDoctor(1L, "Pedro", "12345", "BA", true, specialty);
 
-        return new Consultation(id, patient, doctor, LocalDate.of(2026, 9, 24),
+        Consultation consultation = new Consultation(id, patient, doctor, LocalDate.of(2026, 9, 24),
                 LocalTime.of(15, 30), 30, ConsultationStatus.SCHEDULED, LocalDateTime.now(), LocalDateTime.now());
+
+        if (linkPatientDoctor) {
+            patient.getConsultations().add(consultation);
+            doctor.getConsultations().add(consultation);
+        }
+
+        return consultation;
     }
 
     public static Consultation createConsultation(long id, Patient patient, Doctor doctor, LocalDateTime consultationDataTime) {
