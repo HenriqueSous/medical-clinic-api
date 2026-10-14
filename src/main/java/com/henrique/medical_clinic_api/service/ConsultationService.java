@@ -56,14 +56,17 @@ public class ConsultationService {
         Patient patient = patientService.findById(patientId);
 
         int duration = checkDuration(consultationRequestDTO.duration());
-        Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
-        checkExistingAppointment(patientId, consultation.getConsultationDate());
 
-        checkDoctorSchedule(
-                doctor,
-                LocalDateTime.of(consultationRequestDTO.consultationDate(), consultationRequestDTO.consultationTime()),
-                duration
+        validateAppointment(
+                patientId,
+                doctorId,
+                consultationRequestDTO.consultationDate(),
+                consultationRequestDTO.consultationTime(),
+                duration,
+                false
         );
+
+        Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
 
         consultation.setDoctor(doctor);
         consultation.setPatient(patient);
@@ -83,32 +86,68 @@ public class ConsultationService {
     public Consultation updateByParts(long id, JsonNode jsonNode) {
         Consultation consultation = findById(id);
 
+        LocalDate newLocalDate = null;
+        LocalTime newLocalTime = null;
+        int newDuration = consultation.getDuration();
+
         if (jsonNode.has("consultationDate")) {
-            LocalDate consultationDate = LocalDate.parse(jsonNode.get("consultationDate").asString());
-            consultation.setConsultationDate(consultationDate);
+            newLocalDate = LocalDate.parse(jsonNode.get("consultationDate").asString());
         }
         if (jsonNode.has("consultationTime")) {
-            LocalTime consultationTime = LocalTime.parse(jsonNode.get("consultationTime").asString());
-            consultation.setConsultationTime(consultationTime);
+            newLocalTime = LocalTime.parse(jsonNode.get("consultationTime").asString());
         }
         if (jsonNode.has("duration")) {
-            int duration = checkDuration(jsonNode.get("duration").asInt());
-            consultation.setDuration(duration);
+            newDuration = checkDuration(jsonNode.get("duration").asInt());
+        }
+
+        validateAppointment(
+                consultation.getPatient().getId(),
+                consultation.getDoctor().getId(),
+                newLocalDate,
+                newLocalTime,
+                newDuration,
+                true
+        );
+
+        if (newLocalDate != null) {
+            consultation.setConsultationDate(newLocalDate);
+        }
+        if (newLocalTime != null) {
+            consultation.setConsultationTime(newLocalTime);
+        }
+        if (newDuration != consultation.getDuration()) {
+            consultation.setDuration(newDuration);
         }
         if (jsonNode.has("status")) {
-            String statusStr = jsonNode.get("status").asString().toUpperCase();
-            consultation.setStatus(ConsultationStatus.valueOf(statusStr));
+            consultation.setStatus(
+                    ConsultationStatus.valueOf(jsonNode.get("status").asString().toUpperCase())
+            );
         }
 
         return consultationRepository.save(consultation);
     }
 
-    private void checkDoctorSchedule(Doctor doctor, LocalDateTime dateTime, long duration) {
+    private void validateAppointment(long patientId, long doctorId, LocalDate date, LocalTime time, int duration, boolean exceptThisDateTime) {
+        if (date != null && time != null) {
+            checkExistingPatientSchedule(patientId, date);
+
+            checkDoctorSchedule(
+                    doctorId,
+                    LocalDateTime.of(date, time),
+                    duration,
+                    exceptThisDateTime
+            );
+        }
+    }
+
+    private void checkDoctorSchedule(long doctorId, LocalDateTime dateTime, long duration, boolean exceptThisDateTime) {
+        Doctor doctor = doctorService.findById(doctorId);
         LocalDateTime dateTimePlus = dateTime.plusMinutes(duration);
 
         for (Consultation consultation : doctor.getConsultations()) {
-            if (consultation.getStatus() != ConsultationStatus.CANCELED) {
-                LocalDateTime scheduledDateTime = LocalDateTime.of(consultation.getConsultationDate(), consultation.getConsultationTime());
+            LocalDateTime scheduledDateTime = LocalDateTime.of(consultation.getConsultationDate(), consultation.getConsultationTime());
+
+            if (!(exceptThisDateTime && scheduledDateTime.equals(dateTime)) || consultation.getStatus() != ConsultationStatus.CANCELED) {
                 LocalDateTime scheduledDateTimePlus = scheduledDateTime.plusMinutes(consultation.getDuration());
 
                 if (
@@ -124,7 +163,7 @@ public class ConsultationService {
         }
     }
 
-    private void checkExistingAppointment(long patientId, LocalDate date) {
+    private void checkExistingPatientSchedule(long patientId, LocalDate date) {
         ConsultationQueryFilter filterPatientConsultationDate = ConsultationQueryFilter.builder()
                 .patientId(patientId)
                 .consultationDate(date)
