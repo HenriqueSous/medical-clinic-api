@@ -100,6 +100,15 @@ public class ConsultationService {
             newDuration = checkDuration(jsonNode.get("duration").asInt());
         }
 
+        if (newLocalDate == null && newLocalTime == null) {
+            newLocalDate = consultation.getConsultationDate();
+            newLocalTime = consultation.getConsultationTime();
+        } else if (newLocalDate != null && newLocalTime == null) {
+            newLocalTime = consultation.getConsultationTime();
+        } else if (newLocalDate == null) {
+            newLocalDate = consultation.getConsultationDate();
+        }
+
         validateAppointment(
                 consultation.getPatient().getId(),
                 consultation.getDoctor().getId(),
@@ -128,16 +137,14 @@ public class ConsultationService {
     }
 
     private void validateAppointment(long patientId, long doctorId, LocalDate date, LocalTime time, int duration, boolean exceptThisDateTime) {
-        if (date != null && time != null) {
-            checkExistingPatientSchedule(patientId, date);
+        checkExistingPatientSchedule(patientId, date);
 
-            checkDoctorSchedule(
-                    doctorId,
-                    LocalDateTime.of(date, time),
-                    duration,
-                    exceptThisDateTime
-            );
-        }
+        checkDoctorSchedule(
+                doctorId,
+                LocalDateTime.of(date, time),
+                duration,
+                exceptThisDateTime
+        );
     }
 
     private void checkDoctorSchedule(long doctorId, LocalDateTime dateTime, long duration, boolean exceptThisDateTime) {
