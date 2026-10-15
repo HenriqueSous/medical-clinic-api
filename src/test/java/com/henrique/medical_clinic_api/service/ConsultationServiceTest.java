@@ -20,6 +20,8 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.util.ReflectionTestUtils;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,9 +46,11 @@ class ConsultationServiceTest {
     @Captor
     private ArgumentCaptor<Consultation> consultationCaptor;
 
+    private final ObjectMapper mapper = new ObjectMapper();
+
     @Test
     void findById_ReturnConsultation_WhenConsultationExists() {
-        Consultation consultationMock = ConsultationUtil.createConsultation(1L);
+        Consultation consultationMock = ConsultationUtil.createConsultation(1L, false);
 
         Mockito.when(consultationRepository.findById(consultationMock.getId()))
                 .thenReturn(Optional.of(consultationMock));
@@ -59,7 +63,7 @@ class ConsultationServiceTest {
 
     @Test
     void findById_ThrowsResourceNotFoundException_WhenConsultationNotExists() {
-        Consultation consultationMock = ConsultationUtil.createConsultation(1L);
+        Consultation consultationMock = ConsultationUtil.createConsultation(1L, false);
 
         Mockito.when(consultationRepository.findById(consultationMock.getId()))
                 .thenReturn(Optional.empty());
@@ -244,5 +248,59 @@ class ConsultationServiceTest {
         Assertions.assertThrows(DuplicateAppointmentDateException.class, () -> consultationService.save(consultationRequestDTO));
 
         Mockito.verify(consultationRepository, Mockito.never()).save(ArgumentMatchers.any(Consultation.class));
+    }
+
+    @Test
+    void updateByParts_UpdateAllConsultationData_WhenCorrectDataIsProvided() {
+        long consultationId = 1L;
+        Consultation consultationMock = ConsultationUtil.createConsultation(consultationId, true);
+
+        LocalDate newLocalDate = LocalDate.of(2026, 11, 5);
+        LocalTime newLocalTime = LocalTime.of(9, 30);
+        int newDuration = 20;
+        ConsultationStatus newStatus = ConsultationStatus.CONFIRMED;
+
+        ObjectNode jsonNode = mapper.createObjectNode();
+        jsonNode.put("consultationDate", newLocalDate.toString());
+        jsonNode.put("consultationTime", newLocalTime.toString());
+        jsonNode.put("duration", newDuration);
+        jsonNode.put("status", newStatus.toString().toLowerCase());
+
+        Mockito.when(consultationRepository.findById(consultationId))
+                .thenReturn(Optional.of(consultationMock));
+        Mockito.when(consultationRepository.findAll(ArgumentMatchers.any(Specification.class)))
+                        .thenReturn(List.of());
+        Mockito.when(doctorService.findById(consultationMock.getDoctor().getId()))
+                        .thenReturn(consultationMock.getDoctor());
+        Mockito.when(consultationRepository.save(ArgumentMatchers.any(Consultation.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        Consultation consultationUpdated = consultationService.updateByParts(consultationId, jsonNode);
+
+        Patient patientMock = consultationMock.getPatient();
+        Patient patientOfConsultationUpdated = consultationUpdated.getPatient();
+        Doctor doctorMock = consultationMock.getDoctor();
+        Doctor doctorOfConsultationUpdated = consultationUpdated.getDoctor();
+
+        Assertions.assertNotNull(consultationUpdated);
+        Assertions.assertEquals(consultationId, consultationUpdated.getId());
+        Assertions.assertEquals(newLocalDate, consultationUpdated.getConsultationDate());
+        Assertions.assertEquals(newLocalTime, consultationUpdated.getConsultationTime());
+        Assertions.assertEquals(newDuration, consultationUpdated.getDuration());
+        Assertions.assertEquals(newStatus, consultationUpdated.getStatus());
+
+        Assertions.assertEquals(patientMock.getId(), patientOfConsultationUpdated.getId());
+        Assertions.assertEquals(patientMock.getName(), patientOfConsultationUpdated.getName());
+        Assertions.assertEquals(patientMock.getCpf(), patientOfConsultationUpdated.getCpf());
+        Assertions.assertEquals(patientMock.getConsultations(), patientOfConsultationUpdated.getConsultations());
+
+        Assertions.assertEquals(doctorMock.getId(), doctorOfConsultationUpdated.getId());
+        Assertions.assertEquals(doctorMock.getName(), doctorOfConsultationUpdated.getName());
+        Assertions.assertEquals(doctorMock.getCrm(), doctorOfConsultationUpdated.getCrm());
+        Assertions.assertEquals(doctorMock.getUf(), doctorOfConsultationUpdated.getUf());
+        Assertions.assertEquals(doctorMock.getSpecialties(), doctorOfConsultationUpdated.getSpecialties());
+        Assertions.assertEquals(doctorMock.getConsultations(), doctorOfConsultationUpdated.getConsultations());
+
+        Mockito.verify(consultationRepository, Mockito.times(1)).save(ArgumentMatchers.any(Consultation.class));
     }
 }
