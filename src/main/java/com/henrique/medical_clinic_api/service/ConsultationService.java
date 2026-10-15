@@ -154,7 +154,7 @@ public class ConsultationService {
         for (Consultation consultation : doctor.getConsultations()) {
             LocalDateTime scheduledDateTime = LocalDateTime.of(consultation.getConsultationDate(), consultation.getConsultationTime());
 
-            if (!(exceptThisDateTime && scheduledDateTime.equals(dateTime)) || consultation.getStatus() != ConsultationStatus.CANCELED) {
+            if (!(exceptThisDateTime && scheduledDateTime.equals(dateTime)) && consultation.getStatus() != ConsultationStatus.CANCELED) {
                 LocalDateTime scheduledDateTimePlus = scheduledDateTime.plusMinutes(consultation.getDuration());
 
                 if (
