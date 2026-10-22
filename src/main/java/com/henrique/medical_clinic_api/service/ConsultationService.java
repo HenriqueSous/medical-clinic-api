@@ -63,7 +63,7 @@ public class ConsultationService {
                 consultationRequestDTO.consultationDate(),
                 consultationRequestDTO.consultationTime(),
                 duration,
-                false
+                0
         );
 
         Consultation consultation = consultationMapper.toEntity(consultationRequestDTO, duration);
@@ -115,7 +115,7 @@ public class ConsultationService {
                 newLocalDate,
                 newLocalTime,
                 newDuration,
-                true
+                id
         );
 
         if (newLocalDate != null) {
@@ -136,27 +136,26 @@ public class ConsultationService {
         return consultationRepository.save(consultation);
     }
 
-    private void validateAppointment(long patientId, long doctorId, LocalDate date, LocalTime time, int duration, boolean exceptThisDateTime) {
+    private void validateAppointment(long patientId, long doctorId, LocalDate date, LocalTime time, int duration, long exceptThisId) {
         checkExistingPatientSchedule(patientId, date);
 
         checkDoctorSchedule(
                 doctorId,
                 LocalDateTime.of(date, time),
                 duration,
-                exceptThisDateTime
+                exceptThisId
         );
     }
 
-    private void checkDoctorSchedule(long doctorId, LocalDateTime dateTime, long duration, boolean exceptThisDateTime) {
+    private void checkDoctorSchedule(long doctorId, LocalDateTime dateTime, long duration, long exceptThisId) {
         Doctor doctor = doctorService.findById(doctorId);
         LocalDateTime dateTimePlus = dateTime.plusMinutes(duration);
 
         for (Consultation consultation : doctor.getConsultations()) {
             LocalDateTime scheduledDateTime = LocalDateTime.of(consultation.getConsultationDate(), consultation.getConsultationTime());
 
-            if (!(exceptThisDateTime && scheduledDateTime.equals(dateTime)) && consultation.getStatus() != ConsultationStatus.CANCELED) {
+            if (exceptThisId != consultation.getId() && consultation.getStatus() != ConsultationStatus.CANCELED) {
                 LocalDateTime scheduledDateTimePlus = scheduledDateTime.plusMinutes(consultation.getDuration());
-
                 if (
                         dateTime.isAfter(scheduledDateTime) && dateTime.isBefore(scheduledDateTimePlus) ||
                         dateTimePlus.isAfter(scheduledDateTime) && dateTimePlus.isBefore(scheduledDateTimePlus) ||
