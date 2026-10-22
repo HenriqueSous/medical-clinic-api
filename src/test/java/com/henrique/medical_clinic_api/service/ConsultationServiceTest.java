@@ -240,6 +240,7 @@ class ConsultationServiceTest {
                         patientMock,
                         doctorMock,
                         LocalDateTime.of(2026, 10, 13, 9, 20),
+                        30,
                         true
                 )));
 
@@ -486,5 +487,64 @@ class ConsultationServiceTest {
         Assertions.assertEquals(doctorMock.getConsultations(), doctorOfConsultationUpdated.getConsultations());
 
         Mockito.verify(consultationRepository, Mockito.times(1)).save(ArgumentMatchers.any(Consultation.class));
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            value = {
+                    "2026-11-05T09:30;2026-11-05;;false;30;2",
+                    "2026-11-05T09:30;;09:40;true;30;2",
+                    "2026-11-05T09:30;2026-11-05;09:40;false;30;2",
+                    "2026-11-05T09:30;2026-11-05;09:20;false;30;2",
+                    "2026-11-05T09:30;2026-11-05;09:20;false;30;2",
+                    "2026-11-05T09:30;2026-11-05;09:20;false;60;2",
+            },
+            delimiter = ';'
+    )
+    void updateByParts_ThrowsDoctorScheduleConflictException_WhenThereIsConflictInTheDoctorSchedule(
+            LocalDateTime dateTimeFirstConsultation,
+            LocalDate dateUpdated,
+            LocalTime timeUpdated,
+            boolean sameDate,
+            int duration,
+            long id
+    ) {
+        Consultation firstConsultationMock = ConsultationUtil.createConsultation(
+                1L, dateTimeFirstConsultation, true
+        );
+        Doctor doctor = firstConsultationMock.getDoctor();
+
+        Patient patientForUpdated = PatientUtil.createPatient(2L, "Marcelo", "09876545678");
+
+        Consultation consultationUpdate = ConsultationUtil.createConsultation(
+                id,
+                patientForUpdated,
+                doctor,
+                dateTimeFirstConsultation,
+                duration,
+                true
+        );
+        if (sameDate) {
+            consultationUpdate.setConsultationTime(dateTimeFirstConsultation.toLocalTime().plusHours(3));
+        } else {
+            consultationUpdate.setConsultationDate(dateTimeFirstConsultation.toLocalDate().plusDays(3));
+        }
+
+        ObjectNode jsonNode = mapper.createObjectNode();
+        if (dateUpdated != null) {
+            jsonNode.put("consultationDate", dateUpdated.toString());
+        }
+        if (timeUpdated != null) {
+            jsonNode.put("consultationTime", timeUpdated.toString());
+        }
+
+        Mockito.when(consultationRepository.findById(id))
+                .thenReturn(Optional.of(firstConsultationMock));
+        Mockito.when(doctorService.findById(firstConsultationMock.getDoctor().getId()))
+                .thenReturn(firstConsultationMock.getDoctor());
+
+        Assertions.assertThrows(DoctorScheduleConflictException.class, () -> consultationService.updateByParts(id, jsonNode));
+
+        Mockito.verify(consultationRepository, Mockito.never()).save(ArgumentMatchers.any(Consultation.class));
     }
 }
