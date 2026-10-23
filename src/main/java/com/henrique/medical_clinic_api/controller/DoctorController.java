@@ -47,7 +47,7 @@ public class DoctorController {
     @PostMapping
     private ResponseEntity<DoctorResponseDTO> post(@Valid @RequestBody DoctorRequestDTO doctorRequestDTO) {
         Doctor doctor = doctorMapper.toEntity(doctorRequestDTO);
-        return ResponseEntity.ok(doctorMapper.toResponse(doctorService.save(doctor)));
+        return ResponseEntity.ok(doctorMapper.toResponse(doctorService.save(doctor, doctorRequestDTO.specialties())));
     }
 
     @PatchMapping("/{id}")

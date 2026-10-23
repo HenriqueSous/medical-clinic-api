@@ -36,7 +36,7 @@ public class DoctorService {
     }
 
     @Transactional
-    public Doctor save(Doctor doctor) {
+    public Doctor save(Doctor doctor, List<String> specialtiesName) {
         List<Specialty> specialtiesToBeSaved = new ArrayList<>();
 
         List<Doctor> doctors = find(new DoctorQueryFilter(null, doctor.getCrm(), doctor.getUf()));
@@ -44,20 +44,19 @@ public class DoctorService {
             throw new DuplicateResourceException("Doctor", "CRM", String.format("%s-%s", doctor.getCrm(), doctor.getUf()));
         }
 
-        for (Specialty specialty : doctor.getSpecialties()) {
-            List<Specialty> specialties = specialtyService.findByOptionalFilters(specialty.getName(), null);
+        for (String specialtyName : specialtiesName) {
+            List<Specialty> specialties = specialtyService.findByOptionalFilters(specialtyName, null);
 
             if (!specialties.isEmpty()) {
                 if (specialties.size() > 1) {
-                    throw new DuplicateResourceException("Specialty", "name", specialty.getName());
+                    throw new DuplicateResourceException("Specialty", "name", specialtyName);
                 }
 
-                Specialty specialtyByName = specialties.getFirst();
-                specialtyByName.getDoctors().add(doctor);
-
-                specialtiesToBeSaved.add(specialtyByName);
+                Specialty specialtyFound = specialties.getFirst();
+                specialtyFound.getDoctors().add(doctor);
+                specialtiesToBeSaved.add(specialtyFound);
             } else {
-                throw new ResourceNotFoundException("Specialty with name '" + specialty.getName() + "' not found");
+                throw new ResourceNotFoundException("Specialty with name '" + specialtyName + "' not found");
             }
         }
 

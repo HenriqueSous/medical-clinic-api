@@ -1,6 +1,5 @@
 package com.henrique.medical_clinic_api.dto.doctor;
 
-import com.henrique.medical_clinic_api.dto.specialty.SpecialtyRequestDtO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
@@ -14,6 +13,6 @@ public record DoctorRequestDTO(
         @NotBlank(message = "The doctor uf is mandatory")
         String uf,
         @Valid
-        List<SpecialtyRequestDtO> specialties
+        List<String> specialties
 ) {
 }
