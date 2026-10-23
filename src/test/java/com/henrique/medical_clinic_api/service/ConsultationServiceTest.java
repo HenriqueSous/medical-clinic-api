@@ -547,4 +547,34 @@ class ConsultationServiceTest {
 
         Mockito.verify(consultationRepository, Mockito.never()).save(ArgumentMatchers.any(Consultation.class));
     }
+
+    @Test
+    void updateByParts_ThrowsDuplicateAppointmentDateException_WhenExistingPatientSchedule() {
+        long consultationId = 2L;
+        Consultation consultationMock = ConsultationUtil.createConsultation(1L, true);
+
+        Consultation consultationToUpdate = ConsultationUtil.createConsultation(
+                consultationId,
+                consultationMock.getPatient(),
+                DoctorUtil.createDoctor(3L, "Ana", "67584", "BA"),
+                LocalDateTime.of(2026, 12, 5, 12, 20),
+                30,
+                true
+        );
+
+        LocalDate newDate = consultationMock.getConsultationDate();
+
+        ObjectNode jsonNode = mapper.createObjectNode();
+        jsonNode.put("consultationDate", newDate.toString());
+
+        Mockito.when(consultationRepository.findById(consultationId))
+                .thenReturn(Optional.of(consultationToUpdate));
+        Mockito.when(consultationRepository.findAll(ArgumentMatchers.any(Specification.class)))
+                .thenReturn(List.of(consultationMock));
+
+        Assertions.assertThrows(
+                DuplicateAppointmentDateException.class, () -> consultationService.updateByParts(consultationId, jsonNode)
+        );
+        Mockito.verify(consultationRepository, Mockito.never()).save(ArgumentMatchers.any(Consultation.class));
+    }
 }
