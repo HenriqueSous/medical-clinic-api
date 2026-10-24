@@ -137,7 +137,7 @@ public class ConsultationService {
     }
 
     private void validateAppointment(long patientId, long doctorId, LocalDate date, LocalTime time, int duration, long exceptThisId) {
-        checkExistingPatientSchedule(patientId, date);
+        checkExistingPatientSchedule(patientId, date, exceptThisId);
 
         checkDoctorSchedule(
                 doctorId,
@@ -169,13 +169,16 @@ public class ConsultationService {
         }
     }
 
-    private void checkExistingPatientSchedule(long patientId, LocalDate date) {
+    private void checkExistingPatientSchedule(long patientId, LocalDate date, long exceptThisId) {
         ConsultationQueryFilter filterPatientConsultationDate = ConsultationQueryFilter.builder()
                 .patientId(patientId)
                 .consultationDate(date)
                 .build();
 
-        if (!find(filterPatientConsultationDate).isEmpty()) {
+        List<Consultation> consultations = find(filterPatientConsultationDate);
+        consultations.removeIf(con -> con.getId() == exceptThisId);
+
+        if (!consultations.isEmpty()) {
             throw new DuplicateAppointmentDateException(patientId, date);
         }
     }
