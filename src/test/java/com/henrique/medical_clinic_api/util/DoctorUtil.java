@@ -10,7 +10,7 @@ import java.util.List;
 
 public class DoctorUtil {
     public static Doctor createDoctor(long id, String name, String crm, String uf) {
-        return new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>(), List.of());
+        return new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>(), new ArrayList<>());
     }
 
     public static Doctor createDoctor(long id, String name, String crm, String uf, boolean linkSpecialties, Specialty... specialties) {
@@ -24,12 +24,6 @@ public class DoctorUtil {
         }
 
         return doctor;
-    }
-
-    public static List<Doctor> listOfDoctors() {
-        return List.of(
-                createDoctor(1, "Henrique", "12345", "BA")
-        );
     }
 
     private static void linkDoctorToSpecialties(Doctor doctor, Specialty... specialties) {

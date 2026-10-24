@@ -41,7 +41,7 @@ class DoctorServiceTest {
     @Test
     void findAll_ReturnListOfAllDoctors_WhenSuccessful() {
         Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
-                .thenReturn(DoctorUtil.listOfDoctors());
+                .thenReturn(List.of(DoctorUtil.createDoctor(1L, "Henrique", "57863", "BA")));
 
         List<Doctor> doctors = doctorService.find(new DoctorQueryFilter(null, null, null));
 
@@ -78,7 +78,7 @@ class DoctorServiceTest {
     @Test
     void save_SaveNewDoctor_WhenCorrectDataIsProvided() {
         Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Clínico Geral", "Descrição");
-        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", false, specialty);
+        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", false);
 
         Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
                 .thenReturn(List.of());
@@ -87,17 +87,27 @@ class DoctorServiceTest {
         Mockito.when(doctorRepository.save(doctorMock))
                 .thenAnswer(inv -> inv.getArgument(0));
 
-        Doctor doctorSaved = doctorService.save(doctorMock);
-        Specialty specialtySaved = doctorMock.getSpecialties().getFirst();
+        Doctor doctorSaved = doctorService.save(doctorMock, List.of(specialty.getName()));
 
         Assertions.assertNotNull(doctorSaved);
         Assertions.assertEquals(doctorMock.getId(), doctorSaved.getId());
         Assertions.assertEquals(doctorMock.getName(), doctorSaved.getName());
         Assertions.assertEquals(doctorMock.getCrm(), doctorSaved.getCrm());
         Assertions.assertEquals(doctorMock.getUf(), doctorSaved.getUf());
-        Assertions.assertEquals(doctorMock.getSpecialties(), doctorSaved.getSpecialties());
+
+        Assertions.assertEquals(1, doctorSaved.getSpecialties().size());
+        Specialty specialtySaved = doctorMock.getSpecialties().getFirst();
+        Assertions.assertEquals(specialty.getId(), specialtySaved.getId());
+        Assertions.assertEquals(specialty.getName(), specialtySaved.getName());
+        Assertions.assertEquals(specialty.getDescription(), specialtySaved.getDescription());
+
         Assertions.assertEquals(1, specialtySaved.getDoctors().size());
-        Assertions.assertTrue(specialtySaved.getDoctors().contains(doctorMock));
+        Doctor doctorOfSpecialty = specialtySaved.getDoctors().getFirst();
+        Assertions.assertEquals(doctorOfSpecialty.getId(), doctorSaved.getId());
+        Assertions.assertEquals(doctorOfSpecialty.getName(), doctorSaved.getName());
+        Assertions.assertEquals(doctorOfSpecialty.getCrm(), doctorSaved.getCrm());
+        Assertions.assertEquals(doctorOfSpecialty.getUf(), doctorSaved.getUf());
+
         Mockito.verify(doctorRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Specification.class));
         Mockito.verify(doctorRepository, Mockito.times(1)).save(doctorMock);
     }
@@ -110,7 +120,7 @@ class DoctorServiceTest {
         Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
                 .thenReturn(List.of(doctorMock));
 
-        Assertions.assertThrows(DuplicateResourceException.class, () -> doctorService.save(doctorMock));
+        Assertions.assertThrows(DuplicateResourceException.class, () -> doctorService.save(doctorMock, List.of("Ortopedista")));
         Mockito.verify(doctorRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Specification.class));
         Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
     }
@@ -125,7 +135,7 @@ class DoctorServiceTest {
         Mockito.when(specialtyService.findByOptionalFilters(specialty.getName(), null))
                 .thenReturn(List.of(specialty, specialty));
 
-        Assertions.assertThrows(DuplicateResourceException.class, () -> doctorService.save(doctorMock));
+        Assertions.assertThrows(DuplicateResourceException.class, () -> doctorService.save(doctorMock, List.of(specialty.getName())));
         Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
     }
 
@@ -139,7 +149,7 @@ class DoctorServiceTest {
         Mockito.when(specialtyService.findByOptionalFilters(specialty.getName(), null))
                 .thenReturn(List.of());
 
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.save(doctorMock));
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.save(doctorMock, List.of(specialty.getName())));
         Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
     }
 
