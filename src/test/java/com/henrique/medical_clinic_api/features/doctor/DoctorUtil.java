@@ -1,6 +1,5 @@
-package com.henrique.medical_clinic_api.util;
+package com.henrique.medical_clinic_api.features.doctor;
 
-import com.henrique.medical_clinic_api.features.doctor.Doctor;
 import com.henrique.medical_clinic_api.features.specialty.Specialty;
 
 import java.time.LocalDateTime;

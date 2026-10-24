@@ -1,10 +1,11 @@
-package com.henrique.medical_clinic_api.util;
+package com.henrique.medical_clinic_api.features.consultation;
 
-import com.henrique.medical_clinic_api.features.consultation.Consultation;
-import com.henrique.medical_clinic_api.features.consultation.ConsultationStatus;
 import com.henrique.medical_clinic_api.features.doctor.Doctor;
 import com.henrique.medical_clinic_api.features.patient.Patient;
 import com.henrique.medical_clinic_api.features.specialty.Specialty;
+import com.henrique.medical_clinic_api.features.doctor.DoctorUtil;
+import com.henrique.medical_clinic_api.features.patient.PatientUtil;
+import com.henrique.medical_clinic_api.features.specialty.SpecialtyUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

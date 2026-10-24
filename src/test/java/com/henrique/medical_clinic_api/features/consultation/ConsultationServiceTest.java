@@ -1,18 +1,14 @@
-package com.henrique.medical_clinic_api.service;
+package com.henrique.medical_clinic_api.features.consultation;
 
-import com.henrique.medical_clinic_api.features.consultation.*;
 import com.henrique.medical_clinic_api.features.doctor.Doctor;
 import com.henrique.medical_clinic_api.features.doctor.DoctorService;
 import com.henrique.medical_clinic_api.features.patient.Patient;
 import com.henrique.medical_clinic_api.features.patient.PatientService;
-import com.henrique.medical_clinic_api.features.consultation.DoctorScheduleConflictException;
-import com.henrique.medical_clinic_api.features.consultation.DuplicateAppointmentDateException;
 import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.features.specialty.Specialty;
-import com.henrique.medical_clinic_api.util.ConsultationUtil;
-import com.henrique.medical_clinic_api.util.DoctorUtil;
-import com.henrique.medical_clinic_api.util.PatientUtil;
-import com.henrique.medical_clinic_api.util.SpecialtyUtil;
+import com.henrique.medical_clinic_api.features.doctor.DoctorUtil;
+import com.henrique.medical_clinic_api.features.patient.PatientUtil;
+import com.henrique.medical_clinic_api.features.specialty.SpecialtyUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
