@@ -20,6 +20,7 @@ import tools.jackson.databind.JsonNode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -175,7 +176,7 @@ public class ConsultationService {
                 .consultationDate(date)
                 .build();
 
-        List<Consultation> consultations = find(filterPatientConsultationDate);
+        ArrayList<Consultation> consultations = new ArrayList<>(find(filterPatientConsultationDate));
         consultations.removeIf(con -> con.getId() == exceptThisId);
 
         if (!consultations.isEmpty()) {
