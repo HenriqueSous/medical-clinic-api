@@ -1,6 +1,6 @@
 package com.henrique.medical_clinic_api.util;
 
-import com.henrique.medical_clinic_api.model.Patient;
+import com.henrique.medical_clinic_api.features.patient.Patient;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

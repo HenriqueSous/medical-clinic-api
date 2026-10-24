@@ -1,12 +1,14 @@
 package com.henrique.medical_clinic_api.service;
 
-import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
-import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
-import com.henrique.medical_clinic_api.exception.validation.ImmutableFieldException;
-import com.henrique.medical_clinic_api.model.Doctor;
-import com.henrique.medical_clinic_api.model.Specialty;
-import com.henrique.medical_clinic_api.queryFilters.DoctorQueryFilter;
-import com.henrique.medical_clinic_api.repository.DoctorRepository;
+import com.henrique.medical_clinic_api.features.doctor.DoctorService;
+import com.henrique.medical_clinic_api.features.shared.exception.DuplicateResourceException;
+import com.henrique.medical_clinic_api.features.shared.exception.ResourceNotFoundException;
+import com.henrique.medical_clinic_api.features.shared.exception.ImmutableFieldException;
+import com.henrique.medical_clinic_api.features.specialty.SpecialtyService;
+import com.henrique.medical_clinic_api.features.doctor.Doctor;
+import com.henrique.medical_clinic_api.features.specialty.Specialty;
+import com.henrique.medical_clinic_api.features.doctor.DoctorQueryFilter;
+import com.henrique.medical_clinic_api.features.doctor.DoctorRepository;
 import com.henrique.medical_clinic_api.util.DoctorUtil;
 import com.henrique.medical_clinic_api.util.SpecialtyUtil;
 import org.junit.jupiter.api.Assertions;

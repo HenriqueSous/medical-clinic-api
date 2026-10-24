@@ -1,6 +1,6 @@
 package com.henrique.medical_clinic_api.util;
 
-import com.henrique.medical_clinic_api.model.Specialty;
+import com.henrique.medical_clinic_api.features.specialty.Specialty;
 
 import java.util.ArrayList;
 

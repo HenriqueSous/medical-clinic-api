@@ -1,11 +1,12 @@
 package com.henrique.medical_clinic_api.service;
 
-import com.henrique.medical_clinic_api.exception.resource.DuplicateResourceException;
-import com.henrique.medical_clinic_api.exception.resource.ResourceNotFoundException;
-import com.henrique.medical_clinic_api.exception.validation.BodyEmptyException;
-import com.henrique.medical_clinic_api.exception.validation.ImmutableFieldException;
-import com.henrique.medical_clinic_api.model.Patient;
-import com.henrique.medical_clinic_api.repository.PatientRepository;
+import com.henrique.medical_clinic_api.features.patient.PatientService;
+import com.henrique.medical_clinic_api.features.shared.exception.DuplicateResourceException;
+import com.henrique.medical_clinic_api.features.shared.exception.ResourceNotFoundException;
+import com.henrique.medical_clinic_api.features.shared.exception.BodyEmptyException;
+import com.henrique.medical_clinic_api.features.shared.exception.ImmutableFieldException;
+import com.henrique.medical_clinic_api.features.patient.Patient;
+import com.henrique.medical_clinic_api.features.patient.PatientRepository;
 import com.henrique.medical_clinic_api.util.PatientUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -1,0 +1,59 @@
+package com.henrique.medical_clinic_api.features.patient;
+
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import tools.jackson.databind.JsonNode;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("patients")
+public class PatientController {
+    @Autowired
+    private PatientService patientService;
+
+    private final PatientMapper patientMapper = PatientMapper.INSTANCE;
+
+    @GetMapping
+    private ResponseEntity<List<PatientResponseDTO>> get(
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "cpf", required = false) String cpf
+    ) {
+        List<PatientResponseDTO> response;
+        if (cpf == null && name == null) {
+            response = patientMapper.toResponseList(patientService.findAll());
+        } else {
+            response = patientMapper.toResponseList(patientService.findByOptionalFilters(name, cpf));
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    private ResponseEntity<PatientResponseDTO> getById(@PathVariable long id) {
+        PatientResponseDTO response = patientMapper.toResponse(patientService.findById(id));
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    private ResponseEntity<PatientResponseDTO> post(@Valid @RequestBody PatientRequestDTO patientRequestDTO) {
+        Patient patient = patientMapper.toEntity(patientRequestDTO);
+        PatientResponseDTO patientSaved = patientMapper.toResponse(patientService.save(patient));
+
+        return new ResponseEntity<>(patientSaved, HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/{id}")
+    private ResponseEntity<PatientResponseDTO> patch(@PathVariable long id, @RequestBody JsonNode jsonNode) {
+        Patient patient = patientService.updateByParts(id, jsonNode);
+        return ResponseEntity.ok(patientMapper.toResponse(patient));
+    }
+
+    @DeleteMapping("/{id}")
+    private ResponseEntity<Void> delete(@PathVariable long id) {
+        patientService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+}
