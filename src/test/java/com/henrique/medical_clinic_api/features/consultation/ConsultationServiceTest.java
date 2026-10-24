@@ -126,11 +126,16 @@ class ConsultationServiceTest {
         Doctor doctorMock = DoctorUtil.createDoctor(1L, "Pedro", "12345", "BA", true, specialtyMock);
         ConsultationUtil.setDoctorConsultations(doctorMock);
 
+        Patient patient2 = PatientUtil.createPatient(2L, "Inara", "09876543212");
+
         ReflectionTestUtils.setField(consultationService, "consultationMapper", ConsultationMapper.INSTANCE);
         Mockito.when(doctorService.findById(1L))
                 .thenReturn(doctorMock);
         Mockito.when(patientService.findById(1L))
                 .thenReturn(patientMock);
+        Mockito.when(consultationRepository.findAll(ArgumentMatchers.any(Specification.class)))
+                .thenReturn(List.of())
+                .thenReturn(List.of(ConsultationUtil.createConsultation(1L, patient2, doctorMock, LocalDateTime.of(2026, 9, 24, 16, 10), 30, true)));
 
         Assertions.assertThrows(DoctorScheduleConflictException.class, () -> consultationService.save(
                 new ConsultationRequestDTO(1L, 1L,
@@ -513,6 +518,7 @@ class ConsultationServiceTest {
         Doctor doctor = firstConsultationMock.getDoctor();
 
         Patient patientForUpdated = PatientUtil.createPatient(2L, "Marcelo", "09876545678");
+        Patient patient2 = PatientUtil.createPatient(2L, "Inara", "09876543212");
 
         Consultation consultationUpdate = ConsultationUtil.createConsultation(
                 id,
@@ -540,6 +546,9 @@ class ConsultationServiceTest {
                 .thenReturn(Optional.of(firstConsultationMock));
         Mockito.when(doctorService.findById(firstConsultationMock.getDoctor().getId()))
                 .thenReturn(firstConsultationMock.getDoctor());
+        Mockito.when(consultationRepository.findAll(ArgumentMatchers.any(Specification.class)))
+                .thenReturn(List.of())
+                .thenReturn(List.of(ConsultationUtil.createConsultation(1L, patient2, doctor, dateTimeFirstConsultation, 30, true)));
 
         Assertions.assertThrows(DoctorScheduleConflictException.class, () -> consultationService.updateByParts(id, jsonNode));
 

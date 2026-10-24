@@ -145,7 +145,12 @@ public class ConsultationService {
         Doctor doctor = doctorService.findById(doctorId);
         LocalDateTime dateTimePlus = dateTime.plusMinutes(duration);
 
-        for (Consultation consultation : doctor.getConsultations()) {
+        ConsultationQueryFilter filter = ConsultationQueryFilter.builder()
+                .doctorId(doctorId)
+                .consultationDate(dateTime.toLocalDate())
+                .build();
+
+        for (Consultation consultation : find(filter)) {
             LocalDateTime scheduledDateTime = LocalDateTime.of(consultation.getConsultationDate(), consultation.getConsultationTime());
 
             if (exceptThisId != consultation.getId() && consultation.getStatus() != ConsultationStatus.CANCELED) {
