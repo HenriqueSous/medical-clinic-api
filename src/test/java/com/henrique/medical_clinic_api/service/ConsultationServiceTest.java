@@ -7,7 +7,7 @@ import com.henrique.medical_clinic_api.features.patient.Patient;
 import com.henrique.medical_clinic_api.features.patient.PatientService;
 import com.henrique.medical_clinic_api.features.consultation.DoctorScheduleConflictException;
 import com.henrique.medical_clinic_api.features.consultation.DuplicateAppointmentDateException;
-import com.henrique.medical_clinic_api.features.shared.exception.ResourceNotFoundException;
+import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.features.specialty.Specialty;
 import com.henrique.medical_clinic_api.util.ConsultationUtil;
 import com.henrique.medical_clinic_api.util.DoctorUtil;

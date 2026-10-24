@@ -2,7 +2,7 @@ package com.henrique.medical_clinic_api.features.consultation;
 
 import com.henrique.medical_clinic_api.features.doctor.DoctorService;
 import com.henrique.medical_clinic_api.features.patient.PatientService;
-import com.henrique.medical_clinic_api.features.shared.exception.ResourceNotFoundException;
+import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.features.doctor.Doctor;
 import com.henrique.medical_clinic_api.features.patient.Patient;
 import org.springframework.beans.factory.annotation.Autowired;

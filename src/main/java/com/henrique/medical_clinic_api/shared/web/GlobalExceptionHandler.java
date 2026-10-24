@@ -1,6 +1,6 @@
-package com.henrique.medical_clinic_api.features.shared.web;
+package com.henrique.medical_clinic_api.shared.web;
 
-import com.henrique.medical_clinic_api.features.shared.exception.BusinessException;
+import com.henrique.medical_clinic_api.shared.exception.BusinessException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.Nullable;
 import org.springframework.dao.DataIntegrityViolationException;

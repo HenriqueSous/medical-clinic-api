@@ -1,18 +1,20 @@
-package com.henrique.medical_clinic_api.features.shared.web;
+package com.henrique.medical_clinic_api.shared.web;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Getter
 @Builder
-@JsonPropertyOrder({"timestamp", "status", "error", "message", "path"})
-public class ExceptionResponseDTO {
+@JsonPropertyOrder({"timestamp", "status", "error", "message", "fields", "path"})
+public class ValidationExceptionResponseDTO {
     private LocalDateTime timestamp;
     private Integer status;
     private String error;
     private String message;
+    private Map<String, String> fields;
     private String path;
 }

@@ -1,9 +1,9 @@
 package com.henrique.medical_clinic_api.features.specialty;
 
-import com.henrique.medical_clinic_api.features.shared.exception.DuplicateResourceException;
-import com.henrique.medical_clinic_api.features.shared.exception.ResourceNotFoundException;
-import com.henrique.medical_clinic_api.features.shared.exception.BodyEmptyException;
-import com.henrique.medical_clinic_api.features.shared.exception.ImmutableFieldException;
+import com.henrique.medical_clinic_api.shared.exception.DuplicateResourceException;
+import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
+import com.henrique.medical_clinic_api.shared.exception.BodyEmptyException;
+import com.henrique.medical_clinic_api.shared.exception.ImmutableFieldException;
 import com.henrique.medical_clinic_api.features.doctor.Doctor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

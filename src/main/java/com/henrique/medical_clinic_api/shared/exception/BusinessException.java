@@ -1,4 +1,4 @@
-package com.henrique.medical_clinic_api.features.shared.exception;
+package com.henrique.medical_clinic_api.shared.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
