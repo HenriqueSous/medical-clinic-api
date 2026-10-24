@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PatientRepository extends JpaRepository<Patient, Long> {
+interface PatientRepository extends JpaRepository<Patient, Long> {
 
     @Query(
             "SELECT p FROM Patient p " +

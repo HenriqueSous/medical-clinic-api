@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface SpecialtyRepository extends JpaRepository<Specialty, Long> {
+interface SpecialtyRepository extends JpaRepository<Specialty, Long> {
     @Query(
             "SELECT s FROM Specialty s " +
                     "WHERE (:name IS NULL OR s.name LIKE CONCAT(:name, '%'))" +
