@@ -12,6 +12,6 @@ public class PatientUtil {
     }
 
     public static Patient createPatient(long id, String name, String cpf) {
-        return new Patient(id, name, cpf, LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>());
+        return new Patient(id, name, cpf, LocalDateTime.now(), LocalDateTime.now());
     }
 }

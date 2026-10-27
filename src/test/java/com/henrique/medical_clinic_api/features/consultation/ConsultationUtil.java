@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class ConsultationUtil {
-    public static Consultation createConsultation(long id, boolean linkPatientDoctor) {
+    public static Consultation createConsultation(long id) {
         Patient patient = PatientUtil.createPatient(1L, "Henrique", "12345678909");
         Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
         Doctor doctor = DoctorUtil.createDoctor(1L, "Pedro", "12345", "BA", true, specialty);
@@ -28,14 +28,10 @@ public class ConsultationUtil {
                 LocalDateTime.now(), LocalDateTime.now()
         );
 
-        if (linkPatientDoctor) {
-            linkPatientDoctorToConsultation(patient, doctor, consultation);
-        }
-
         return consultation;
     }
 
-    public static Consultation createConsultation(long id, LocalDateTime dateTime, boolean linkPatientDoctor) {
+    public static Consultation createConsultation(long id, LocalDateTime dateTime) {
         Patient patient = PatientUtil.createPatient(1L, "Henrique", "12345678909");
         Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
         Doctor doctor = DoctorUtil.createDoctor(1L, "Pedro", "12345", "BA", true, specialty);
@@ -50,34 +46,13 @@ public class ConsultationUtil {
                 ConsultationStatus.SCHEDULED, LocalDateTime.now(), LocalDateTime.now()
         );
 
-        if (linkPatientDoctor) {
-            linkPatientDoctorToConsultation(patient, doctor, consultation);
-        }
-
         return consultation;
     }
 
-    public static Consultation createConsultation(long id, Patient patient, Doctor doctor, LocalDateTime consultationDataTime, int duration, boolean linkPatientDoctor) {
+    public static Consultation createConsultation(long id, Patient patient, Doctor doctor, LocalDateTime consultationDataTime, int duration) {
         Consultation consultation = new Consultation(id, patient, doctor, consultationDataTime.toLocalDate(), consultationDataTime.toLocalTime(),
                 duration, ConsultationStatus.SCHEDULED, LocalDateTime.now(), LocalDateTime.now());
 
-        if (linkPatientDoctor) {
-            linkPatientDoctorToConsultation(patient, doctor, consultation);
-        }
-
         return consultation;
-    }
-
-    public static void setDoctorConsultations(Doctor doctor) {
-        Patient patient1 = PatientUtil.createPatient(2L, "Inara", "09876543212");
-
-        doctor.getConsultations().add(
-            createConsultation(1L, patient1, doctor, LocalDateTime.of(2026, 9, 24, 16, 10), 30, true)
-        );
-    }
-
-    public static void linkPatientDoctorToConsultation(Patient patient, Doctor doctor, Consultation consultation) {
-        patient.getConsultations().add(consultation);
-        doctor.getConsultations().add(consultation);
     }
 }

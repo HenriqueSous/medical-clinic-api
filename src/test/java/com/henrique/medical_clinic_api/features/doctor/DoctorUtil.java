@@ -9,12 +9,11 @@ import java.util.List;
 
 public class DoctorUtil {
     public static Doctor createDoctor(long id, String name, String crm, String uf) {
-        return new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>(), new ArrayList<>());
+        return new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>());
     }
 
     public static Doctor createDoctor(long id, String name, String crm, String uf, boolean linkSpecialties, Specialty... specialties) {
-        Doctor doctor = new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(),
-                new ArrayList<>(), new ArrayList<>());
+        Doctor doctor = new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>());
 
         if (linkSpecialties) {
             linkDoctorToSpecialties(doctor, specialties);
