@@ -37,7 +37,4 @@ public class Patient {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-
-    @OneToMany(mappedBy = "patient", cascade = CascadeType.MERGE)
-    private List<Consultation> consultations = new ArrayList<>();
 }

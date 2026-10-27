@@ -42,9 +42,6 @@ public class Doctor {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "doctor", cascade = CascadeType.MERGE)
-    private List<Consultation> consultations = new ArrayList<>();
-
     @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
             name = "doctor_specialty",

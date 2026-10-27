@@ -65,9 +65,6 @@ public class ConsultationService {
         consultation.setDoctor(doctor);
         consultation.setPatient(patient);
 
-        doctor.getConsultations().add(consultation);
-        patient.getConsultations().add(consultation);
-
         return consultationRepository.save(consultation);
     }
 
