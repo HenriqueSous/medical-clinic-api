@@ -44,8 +44,6 @@ class ConsultationServiceTest {
     @Spy
     private ConsultationMapper consultationMapper = ConsultationMapper.INSTANCE;
 
-    private final ObjectMapper mapper = new ObjectMapper();
-
     @Nested
     class FindById {
         @Test
@@ -238,11 +236,22 @@ class ConsultationServiceTest {
 
     @Nested
     class UpdateByParts {
+        private long consultationId;
+        private Consultation consultationMock;
+        private Patient patientMock;
+        private Doctor doctorMock;
+        private final ObjectMapper mapper = new ObjectMapper();
+
+        @BeforeEach
+        void setup() {
+            consultationId = 1L;
+            consultationMock = ConsultationUtil.createConsultation(consultationId);
+            patientMock = consultationMock.getPatient();
+            doctorMock = consultationMock.getDoctor();
+        }
+
         @Test
         void updateByParts_UpdateAllConsultationData_WhenCorrectDataIsProvided() {
-            long consultationId = 1L;
-            Consultation consultationMock = ConsultationUtil.createConsultation(consultationId);
-
             LocalDate newLocalDate = LocalDate.of(2026, 11, 5);
             LocalTime newLocalTime = LocalTime.of(9, 30);
             int newDuration = 20;
@@ -265,9 +274,7 @@ class ConsultationServiceTest {
 
             Consultation consultationUpdated = consultationService.updateByParts(consultationId, jsonNode);
 
-            Patient patientMock = consultationMock.getPatient();
             Patient patientOfConsultationUpdated = consultationUpdated.getPatient();
-            Doctor doctorMock = consultationMock.getDoctor();
             Doctor doctorOfConsultationUpdated = consultationUpdated.getDoctor();
 
             Assertions.assertNotNull(consultationUpdated);
@@ -292,9 +299,6 @@ class ConsultationServiceTest {
 
         @Test
         void updateByParts_UpdateOnlyConsultationDate_WhenOnlyConsultationDateIsProvided() {
-            long consultationId = 1L;
-            Consultation consultationMock = ConsultationUtil.createConsultation(consultationId);
-
             LocalDate newLocalDate = LocalDate.of(2026, 11, 5);
 
             ObjectNode jsonNode = mapper.createObjectNode();
@@ -309,9 +313,7 @@ class ConsultationServiceTest {
 
             Consultation consultationUpdated = consultationService.updateByParts(consultationId, jsonNode);
 
-            Patient patientMock = consultationMock.getPatient();
             Patient patientOfConsultationUpdated = consultationUpdated.getPatient();
-            Doctor doctorMock = consultationMock.getDoctor();
             Doctor doctorOfConsultationUpdated = consultationUpdated.getDoctor();
 
             Assertions.assertNotNull(consultationUpdated);
@@ -336,9 +338,6 @@ class ConsultationServiceTest {
 
         @Test
         void updateByParts_UpdateOnlyConsultationTime_WhenOnlyConsultationTimeIsProvided() {
-            long consultationId = 1L;
-            Consultation consultationMock = ConsultationUtil.createConsultation(consultationId);
-
             LocalTime newLocalTime = LocalTime.of(9, 30);
 
             ObjectNode jsonNode = mapper.createObjectNode();
@@ -353,9 +352,7 @@ class ConsultationServiceTest {
 
             Consultation consultationUpdated = consultationService.updateByParts(consultationId, jsonNode);
 
-            Patient patientMock = consultationMock.getPatient();
             Patient patientOfConsultationUpdated = consultationUpdated.getPatient();
-            Doctor doctorMock = consultationMock.getDoctor();
             Doctor doctorOfConsultationUpdated = consultationUpdated.getDoctor();
 
             Assertions.assertNotNull(consultationUpdated);
@@ -380,9 +377,6 @@ class ConsultationServiceTest {
 
         @Test
         void updateByParts_UpdateOnlyDuration_WhenOnlyDurationIsProvided() {
-            long consultationId = 1L;
-            Consultation consultationMock = ConsultationUtil.createConsultation(consultationId);
-
             int newDuration = 20;
 
             ObjectNode jsonNode = mapper.createObjectNode();
@@ -397,9 +391,7 @@ class ConsultationServiceTest {
 
             Consultation consultationUpdated = consultationService.updateByParts(consultationId, jsonNode);
 
-            Patient patientMock = consultationMock.getPatient();
             Patient patientOfConsultationUpdated = consultationUpdated.getPatient();
-            Doctor doctorMock = consultationMock.getDoctor();
             Doctor doctorOfConsultationUpdated = consultationUpdated.getDoctor();
 
             Assertions.assertNotNull(consultationUpdated);
@@ -424,9 +416,6 @@ class ConsultationServiceTest {
 
         @Test
         void updateByParts_UpdateStatusDuration_WhenOnlyStatusIsProvided() {
-            long consultationId = 1L;
-            Consultation consultationMock = ConsultationUtil.createConsultation(consultationId);
-
             ConsultationStatus newStatus = ConsultationStatus.CONFIRMED;
             ObjectNode jsonNode = mapper.createObjectNode();
             jsonNode.put("status", newStatus.toString().toLowerCase());
@@ -440,9 +429,7 @@ class ConsultationServiceTest {
 
             Consultation consultationUpdated = consultationService.updateByParts(consultationId, jsonNode);
 
-            Patient patientMock = consultationMock.getPatient();
             Patient patientOfConsultationUpdated = consultationUpdated.getPatient();
-            Doctor doctorMock = consultationMock.getDoctor();
             Doctor doctorOfConsultationUpdated = consultationUpdated.getDoctor();
 
             Assertions.assertNotNull(consultationUpdated);
@@ -529,12 +516,9 @@ class ConsultationServiceTest {
 
         @Test
         void updateByParts_ThrowsDuplicateAppointmentDateException_WhenExistingPatientSchedule() {
-            long consultationId = 2L;
-            Consultation consultationMock = ConsultationUtil.createConsultation(1L);
-
             Consultation consultationToUpdate = ConsultationUtil.createConsultation(
-                    consultationId,
-                    consultationMock.getPatient(),
+                    2L,
+                    patientMock,
                     DoctorUtil.createDoctor(3L, "Ana", "67584", "BA"),
                     LocalDateTime.of(2026, 12, 5, 12, 20),
                     30
@@ -545,13 +529,13 @@ class ConsultationServiceTest {
             ObjectNode jsonNode = mapper.createObjectNode();
             jsonNode.put("consultationDate", newDate.toString());
 
-            Mockito.when(consultationRepository.findById(consultationId))
+            Mockito.when(consultationRepository.findById(2L))
                     .thenReturn(Optional.of(consultationToUpdate));
             Mockito.when(consultationRepository.findAll(ArgumentMatchers.any(Specification.class)))
                     .thenReturn(List.of(consultationMock));
 
             Assertions.assertThrows(
-                    DuplicateAppointmentDateException.class, () -> consultationService.updateByParts(consultationId, jsonNode)
+                    DuplicateAppointmentDateException.class, () -> consultationService.updateByParts(2L, jsonNode)
             );
             Mockito.verify(consultationRepository, Mockito.never()).save(ArgumentMatchers.any(Consultation.class));
         }
