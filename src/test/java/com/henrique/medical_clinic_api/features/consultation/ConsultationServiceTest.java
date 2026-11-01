@@ -540,4 +540,27 @@ class ConsultationServiceTest {
             Mockito.verify(consultationRepository, Mockito.never()).save(ArgumentMatchers.any(Consultation.class));
         }
     }
+
+    @Nested
+    class Delete {
+        @Test
+        void delete_DeleteConsultation_WhenIdIsFound() {
+            Consultation consultationMock = ConsultationUtil.createConsultation(1L);
+
+            Mockito.when(consultationRepository.findById(1L))
+                    .thenReturn(Optional.of(consultationMock));
+
+            consultationService.delete(1L);
+            Mockito.verify(consultationRepository, Mockito.times(1)).delete(consultationMock);
+        }
+
+        @Test
+        void delete_ThrowsResourceNotFoundException_WhenIdNotFound() {
+            Mockito.when(consultationRepository.findById(1L))
+                    .thenReturn(Optional.empty());
+
+            Assertions.assertThrows(ResourceNotFoundException.class, () -> consultationService.delete(1L));
+            Mockito.verify(consultationRepository, Mockito.never()).delete(ArgumentMatchers.any(Consultation.class));
+        }
+    }
 }
