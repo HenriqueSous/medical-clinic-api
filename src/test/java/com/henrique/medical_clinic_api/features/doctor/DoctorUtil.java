@@ -16,6 +16,18 @@ public class DoctorUtil {
         return new Doctor(1L, "Henrique", "57863", "BA", LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>());
     }
 
+    public static Doctor createDoctor(boolean linkSpecialties, Specialty... specialties) {
+        Doctor doctor = new Doctor(1L, "Henrique", "57863", "BA", LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>());
+
+        if (linkSpecialties) {
+            linkDoctorToSpecialties(doctor, specialties);
+        } else {
+            doctor.setSpecialties(Arrays.asList(specialties));
+        }
+
+        return doctor;
+    }
+
     public static Doctor createDoctor(long id, String name, String crm, String uf, boolean linkSpecialties, Specialty... specialties) {
         Doctor doctor = new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>());
 

@@ -155,61 +155,67 @@ class DoctorServiceTest {
         }
     }
 
-    @Test
-    void delete_deleteDoctor_WhenDoctorExists() {
-        long id = 1L;
-        Doctor doctorMock = DoctorUtil.createDoctor(id, "Henrique", "12345", "BA");
+    @Nested
+    class Delete {
+        @Test
+        void delete_deleteDoctor_WhenDoctorExists() {
+            Doctor doctorMock = DoctorUtil.createDoctor();
+            long id = doctorMock.getId();
 
-        Mockito.when(doctorRepository.findById(id))
-                .thenReturn(Optional.of(doctorMock));
-        Mockito.doNothing()
-                .when(doctorRepository).delete(doctorMock);
+            Mockito.when(doctorRepository.findById(id))
+                    .thenReturn(Optional.of(doctorMock));
+            Mockito.doNothing()
+                    .when(doctorRepository).delete(doctorMock);
 
-        doctorService.delete(id);
-        Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
-        Mockito.verify(doctorRepository, Mockito.times(1)).delete(doctorMock);
+            doctorService.delete(id);
+            Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
+            Mockito.verify(doctorRepository, Mockito.times(1)).delete(doctorMock);
+        }
+
+        @Test
+        void delete_ThrowsResourceNotFoundException_WhenDoctorNotExists() {
+            long id = 1L;
+
+            Mockito.when(doctorRepository.findById(id))
+                    .thenReturn(Optional.empty());
+
+            Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.delete(id));
+            Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
+            Mockito.verify(doctorRepository, Mockito.never()).delete(ArgumentMatchers.any(Doctor.class));
+        }
     }
 
-    @Test
-    void delete_ThrowsResourceNotFoundException_WhenDoctorNotExists() {
-        long id = 1L;
+    @Nested
+    class FindSpecialties {
+        @Test
+        void findSpecialties_ReturnListOfSpecialties_WhenDoctorExists() {
+            Specialty specialty = SpecialtyUtil.createSpecialty();
+            Doctor doctorMock = DoctorUtil.createDoctor(true, specialty);
+            long id = doctorMock.getId();
 
-        Mockito.when(doctorRepository.findById(id))
-                .thenReturn(Optional.empty());
+            Mockito.when(doctorRepository.findById(id))
+                    .thenReturn(Optional.of(doctorMock));
 
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.delete(id));
-        Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
-        Mockito.verify(doctorRepository, Mockito.never()).delete(ArgumentMatchers.any(Doctor.class));
-    }
+            List<Specialty> specialties = doctorService.findSpecialties(id);
+            Specialty firstSpecialty = specialties.getFirst();
 
-    @Test
-    void findSpecialties_ReturnListOfSpecialties_WhenDoctorExists() {
-        long id = 1L;
-        Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Neurologista", "Descrição");
-        Doctor doctorMock = DoctorUtil.createDoctor(id, "Henrique", "12345", "BA", true, specialty);
+            Assertions.assertNotNull(specialties);
+            Assertions.assertEquals(1, specialties.size());
+            Assertions.assertEquals(1, firstSpecialty.getDoctors().size());
+            Assertions.assertSame(doctorMock, firstSpecialty.getDoctors().getFirst());
+            Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
+        }
 
-        Mockito.when(doctorRepository.findById(id))
-                .thenReturn(Optional.of(doctorMock));
+        @Test
+        void findSpecialties_ThrowsResourceNotFoundException_WhenDoctorNotExists() {
+            long id = 1L;
 
-        List<Specialty> specialties = doctorService.findSpecialties(id);
-        Specialty first = specialties.getFirst();
+            Mockito.when(doctorRepository.findById(id))
+                    .thenReturn(Optional.empty());
 
-        Assertions.assertNotNull(specialties);
-        Assertions.assertEquals(1, specialties.size());
-        Assertions.assertEquals(1, first.getDoctors().size());
-        Assertions.assertEquals(doctorMock, first.getDoctors().getFirst());
-        Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
-    }
-
-    @Test
-    void findSpecialties_ThrowsResourceNotFoundException_WhenDoctorNotExists() {
-        long id = 1L;
-
-        Mockito.when(doctorRepository.findById(id))
-                .thenReturn(Optional.empty());
-
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.findSpecialties(id));
-        Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
+            Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.findSpecialties(id));
+            Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
+        }
     }
 
     @Test
