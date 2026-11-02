@@ -100,83 +100,86 @@ class PatientServiceTest {
         }
     }
 
-    @Test
-    void delete_DeletePatient_WhenPatientExists() {
-        long id = 1L;
-        Patient patientMock = PatientUtil.createPatient(id, "Henrique", "12345678987");
+    @Nested
+    class Delete {
+        @Test
+        void delete_DeletePatient_WhenPatientExists() {
+            Patient patientMock = PatientUtil.createPatient();
+            long id = patientMock.getId();
 
-        Mockito.when(patientRepository.findById(id))
-                .thenReturn(Optional.of(patientMock));
+            Mockito.when(patientRepository.findById(id))
+                    .thenReturn(Optional.of(patientMock));
 
-        patientService.delete(id);
-        Mockito.verify(patientRepository, Mockito.times(1)).delete(patientMock);
-        Mockito.verify(patientRepository, Mockito.times(1)).findById(id);
+            patientService.delete(id);
+            Mockito.verify(patientRepository, Mockito.times(1)).delete(patientMock);
+            Mockito.verify(patientRepository, Mockito.times(1)).findById(id);
+        }
+
+        @Test
+        void delete_ThrowsResourceNotFoundException_WhenPatientNotExists() {
+            long id = 1L;
+
+            Mockito.when(patientRepository.findById(id))
+                    .thenReturn(Optional.empty());
+
+            Assertions.assertThrows(ResourceNotFoundException.class, () -> patientService.delete(id));
+            Mockito.verify(patientRepository, Mockito.never()).delete(ArgumentMatchers.any(Patient.class));
+            Mockito.verify(patientRepository, Mockito.times(1)).findById(id);
+        }
     }
 
-    @Test
-    void delete_ThrowsResourceNotFoundException_WhenPatientNotExists() {
-        long id = 1L;
+    @Nested
+    class UpdateByParts {
+        @Test
+        void updateByParts_UpdatePatient_WhenCorrectDataIsProvided() {
+            Patient patientMock = PatientUtil.createPatient();
+            long id = patientMock.getId();
 
-        Mockito.when(patientRepository.findById(id))
-                .thenReturn(Optional.empty());
+            ObjectNode jsonNode = mapper.createObjectNode();
+            String newName = "Inara";
+            jsonNode.put("name", newName);
 
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> patientService.delete(id));
-        Mockito.verify(patientRepository, Mockito.never()).delete(ArgumentMatchers.any(Patient.class));
-        Mockito.verify(patientRepository, Mockito.times(1)).findById(id);
-    }
+            Mockito.when(patientRepository.findById(id))
+                    .thenReturn(Optional.of(patientMock));
+            Mockito.when(patientRepository.save(ArgumentMatchers.any(Patient.class)))
+                    .thenAnswer(inv -> inv.getArgument(0));
 
-    @Test
-    void updateByParts_UpdatePatient_WhenCorrectDataIsProvided() {
-        Patient patientMock = PatientUtil.createPatient(1L, "Henrique", "12345678987");
-        long id = 1L;
-        String name = "Inara";
+            Patient patientUpdated = patientService.updateByParts(id, jsonNode);
 
-        ObjectNode jsonNode = mapper.createObjectNode();
-        jsonNode.put("name", name);
+            Assertions.assertNotNull(patientUpdated);
+            Assertions.assertEquals(id, patientUpdated.getId());
+            Assertions.assertEquals(newName, patientUpdated.getName());
+            Mockito.verify(patientRepository, Mockito.times(1)).save(ArgumentMatchers.any(Patient.class));
+        }
 
-        Mockito.when(patientRepository.findById(1L))
-                .thenReturn(Optional.of(patientMock));
-        Mockito.when(patientRepository.save(ArgumentMatchers.any(Patient.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
+        @Test
+        void updateByParts_ThrowsImmutableFieldException_WhenCpfIsProvided() {
+            ObjectNode jsonNode = mapper.createObjectNode();
+            jsonNode.put("cpf", "94537856381");
 
-        Patient patientUpdated = patientService.updateByParts(1L, jsonNode);
+            Assertions.assertThrows(ImmutableFieldException.class, () -> patientService.updateByParts(1L, jsonNode));
+            Mockito.verify(patientRepository, Mockito.never()).save(ArgumentMatchers.any(Patient.class));
+        }
 
-        Assertions.assertNotNull(patientUpdated);
-        Assertions.assertEquals(id, patientUpdated.getId());
-        Assertions.assertEquals(name, patientUpdated.getName());
-        Mockito.verify(patientRepository, Mockito.times(1)).save(ArgumentMatchers.any(Patient.class));
-    }
+        @Test
+        void updateByParts_ThrowsBodyEmptyException_WhenJsonNodeIsEmpty() {
+            JsonNode jsonNode = mapper.createObjectNode();
 
-    @Test
-    void updateByParts_ThrowsImmutableFieldException_WhenCpfIsProvided() {
-        String cpf = "94537856381";
+            Assertions.assertThrows(BodyEmptyException.class, () -> patientService.updateByParts(1L, jsonNode));
+            Mockito.verify(patientRepository, Mockito.never()).save(ArgumentMatchers.any(Patient.class));
+            Mockito.verify(patientRepository, Mockito.never()).findById(ArgumentMatchers.any(Long.class));
+        }
 
-        ObjectNode jsonNode = mapper.createObjectNode();
-        jsonNode.put("cpf", cpf);
+        @Test
+        void updateByParts_ThrowsResourceNotFoundException_WhenPatientNotExists() {
+            ObjectNode jsonNode = mapper.createObjectNode();
+            jsonNode.put("name", "Inara");
 
-        Assertions.assertThrows(ImmutableFieldException.class, () -> patientService.updateByParts(1L, jsonNode));
-        Mockito.verify(patientRepository, Mockito.never()).save(ArgumentMatchers.any(Patient.class));
-    }
+            Mockito.when(patientRepository.findById(1L))
+                    .thenReturn(Optional.empty());
 
-    @Test
-    void updateByParts_ThrowsBodyEmptyException_WhenJsonNodeIsEmpty() {
-        JsonNode jsonNode = mapper.createObjectNode();
-
-        Assertions.assertThrows(BodyEmptyException.class, () -> patientService.updateByParts(1L, jsonNode));
-        Mockito.verify(patientRepository, Mockito.never()).save(ArgumentMatchers.any(Patient.class));
-        Mockito.verify(patientRepository, Mockito.never()).findById(ArgumentMatchers.any(Long.class));
-    }
-
-    @Test
-    void updateByParts_ThrowsResourceNotFoundException_WhenPatientNotExists() {
-        ObjectNode jsonNode = mapper.createObjectNode();
-        jsonNode.put("name", "Inara");
-
-        Mockito.when(patientRepository.findById(1L))
-                .thenReturn(Optional.empty());
-
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> patientService.updateByParts(1L, jsonNode));
-        Mockito.verify(patientRepository, Mockito.never()).save(ArgumentMatchers.any(Patient.class));
-        Mockito.verify(patientRepository, Mockito.times(1)).findById(ArgumentMatchers.any(Long.class));
+            Assertions.assertThrows(ResourceNotFoundException.class, () -> patientService.updateByParts(1L, jsonNode));
+            Mockito.verify(patientRepository, Mockito.never()).save(ArgumentMatchers.any(Patient.class));
+        }
     }
 }
