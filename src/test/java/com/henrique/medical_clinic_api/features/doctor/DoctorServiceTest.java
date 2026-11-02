@@ -7,6 +7,8 @@ import com.henrique.medical_clinic_api.features.specialty.SpecialtyService;
 import com.henrique.medical_clinic_api.features.specialty.Specialty;
 import com.henrique.medical_clinic_api.features.specialty.SpecialtyUtil;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -36,9 +38,9 @@ class DoctorServiceTest {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Test
-    void findAll_ReturnListOfAllDoctors_WhenSuccessful() {
+    void find_ReturnListOfAllDoctors_WhenSuccessful() {
         Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
-                .thenReturn(List.of(DoctorUtil.createDoctor(1L, "Henrique", "57863", "BA")));
+                .thenReturn(List.of(DoctorUtil.createDoctor()));
 
         List<Doctor> doctors = doctorService.find(new DoctorQueryFilter(null, null, null));
 
@@ -47,107 +49,110 @@ class DoctorServiceTest {
         Mockito.verify(doctorRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Specification.class));
     }
 
-    @Test
-    void findById_ReturnDoctor_WhenIdIsFound() {
-        long id = 1L;
-        Doctor doctorMock = DoctorUtil.createDoctor(id, "Henrique", "12345", "BA");
-        Mockito.when(doctorRepository.findById(id)).thenReturn(Optional.of(doctorMock));
+    @Nested
+    class FindById {
+        @Test
+        void findById_ReturnDoctor_WhenIdIsFound() {
+            long id = 1L;
+            Doctor doctorMock = DoctorUtil.createDoctor();
 
-        Doctor doctor = doctorService.findById(id);
+            Mockito.when(doctorRepository.findById(id)).thenReturn(Optional.of(doctorMock));
+            Doctor doctor = doctorService.findById(id);
 
-        Assertions.assertNotNull(doctor);
-        Assertions.assertEquals(doctorMock.getId(), doctor.getId());
-        Assertions.assertEquals(doctorMock.getName(), doctor.getName());
-        Assertions.assertEquals(doctorMock.getCrm(), doctor.getCrm());
-        Assertions.assertEquals(doctorMock.getUf(), doctor.getUf());
-        Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
+            Assertions.assertNotNull(doctor);
+            Assertions.assertEquals(doctorMock.getId(), doctor.getId());
+            Assertions.assertEquals(doctorMock.getName(), doctor.getName());
+            Assertions.assertEquals(doctorMock.getCrm(), doctor.getCrm());
+            Assertions.assertEquals(doctorMock.getUf(), doctor.getUf());
+        }
+
+        @Test
+        void findById_ThrowsResourceNotFoundException_WhenIdIsNotFound() {
+            long id = 99L;
+            Mockito.when(doctorRepository.findById(id)).thenReturn(Optional.empty());
+
+            Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.findById(id));
+        }
     }
 
-    @Test
-    void findById_ThrowsResourceNotFoundException_WhenIdIsNotFound() {
-        long id = 99L;
-        Mockito.when(doctorRepository.findById(id)).thenReturn(Optional.empty());
+    @Nested
+    class Save {
+        private static Specialty specialtyMock;
+        private static Doctor doctorMock;
 
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.findById(id));
-        Mockito.verify(doctorRepository, Mockito.times(1)).findById(id);
-    }
+        @BeforeAll
+        static void setup() {
+            specialtyMock = SpecialtyUtil.createSpecialty();
+            doctorMock = DoctorUtil.createDoctor();
+        }
 
-    @Test
-    void save_SaveNewDoctor_WhenCorrectDataIsProvided() {
-        Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Clínico Geral", "Descrição");
-        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", false);
+        @Test
+        void save_SaveNewDoctor_WhenCorrectDataIsProvided() {
+            Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
+                    .thenReturn(List.of());
+            Mockito.when(specialtyService.findByOptionalFilters(specialtyMock.getName(), null))
+                    .thenReturn(List.of(specialtyMock));
+            Mockito.when(doctorRepository.save(doctorMock))
+                    .thenAnswer(inv -> inv.getArgument(0));
 
-        Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
-                .thenReturn(List.of());
-        Mockito.when(specialtyService.findByOptionalFilters(specialty.getName(), null))
-                .thenReturn(List.of(specialty));
-        Mockito.when(doctorRepository.save(doctorMock))
-                .thenAnswer(inv -> inv.getArgument(0));
+            Doctor doctorSaved = doctorService.save(doctorMock, List.of(specialtyMock.getName()));
 
-        Doctor doctorSaved = doctorService.save(doctorMock, List.of(specialty.getName()));
+            Assertions.assertNotNull(doctorSaved);
+            Assertions.assertEquals(doctorMock.getId(), doctorSaved.getId());
+            Assertions.assertEquals(doctorMock.getName(), doctorSaved.getName());
+            Assertions.assertEquals(doctorMock.getCrm(), doctorSaved.getCrm());
+            Assertions.assertEquals(doctorMock.getUf(), doctorSaved.getUf());
 
-        Assertions.assertNotNull(doctorSaved);
-        Assertions.assertEquals(doctorMock.getId(), doctorSaved.getId());
-        Assertions.assertEquals(doctorMock.getName(), doctorSaved.getName());
-        Assertions.assertEquals(doctorMock.getCrm(), doctorSaved.getCrm());
-        Assertions.assertEquals(doctorMock.getUf(), doctorSaved.getUf());
+            Assertions.assertEquals(1, doctorSaved.getSpecialties().size());
+            Specialty specialtySaved = doctorMock.getSpecialties().getFirst();
 
-        Assertions.assertEquals(1, doctorSaved.getSpecialties().size());
-        Specialty specialtySaved = doctorMock.getSpecialties().getFirst();
-        Assertions.assertEquals(specialty.getId(), specialtySaved.getId());
-        Assertions.assertEquals(specialty.getName(), specialtySaved.getName());
-        Assertions.assertEquals(specialty.getDescription(), specialtySaved.getDescription());
+            Assertions.assertEquals(specialtyMock.getId(), specialtySaved.getId());
+            Assertions.assertEquals(specialtyMock.getName(), specialtySaved.getName());
+            Assertions.assertEquals(specialtyMock.getDescription(), specialtySaved.getDescription());
 
-        Assertions.assertEquals(1, specialtySaved.getDoctors().size());
-        Doctor doctorOfSpecialty = specialtySaved.getDoctors().getFirst();
-        Assertions.assertEquals(doctorOfSpecialty.getId(), doctorSaved.getId());
-        Assertions.assertEquals(doctorOfSpecialty.getName(), doctorSaved.getName());
-        Assertions.assertEquals(doctorOfSpecialty.getCrm(), doctorSaved.getCrm());
-        Assertions.assertEquals(doctorOfSpecialty.getUf(), doctorSaved.getUf());
+            Assertions.assertEquals(1, specialtySaved.getDoctors().size());
+            Doctor doctorOfSpecialty = specialtySaved.getDoctors().getFirst();
 
-        Mockito.verify(doctorRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Specification.class));
-        Mockito.verify(doctorRepository, Mockito.times(1)).save(doctorMock);
-    }
+            Assertions.assertEquals(doctorOfSpecialty.getId(), doctorSaved.getId());
+            Assertions.assertEquals(doctorOfSpecialty.getName(), doctorSaved.getName());
+            Assertions.assertEquals(doctorOfSpecialty.getCrm(), doctorSaved.getCrm());
+            Assertions.assertEquals(doctorOfSpecialty.getUf(), doctorSaved.getUf());
 
-    @Test
-    void save_ThrowsDuplicateResourceException_WhenDoctorExists() {
-        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA");
+            Mockito.verify(doctorRepository, Mockito.times(1)).save(doctorMock);
+        }
 
-        // Fix the gap caused by any() in the integration tests
-        Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
-                .thenReturn(List.of(doctorMock));
+        @Test
+        void save_ThrowsDuplicateResourceException_WhenDoctorExists() {
+            // Fix the gap caused by any() in the integration tests
+            Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
+                    .thenReturn(List.of(doctorMock));
 
-        Assertions.assertThrows(DuplicateResourceException.class, () -> doctorService.save(doctorMock, List.of("Ortopedista")));
-        Mockito.verify(doctorRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Specification.class));
-        Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
-    }
+            Assertions.assertThrows(DuplicateResourceException.class, () -> doctorService.save(doctorMock, List.of("Ortopedista")));
+            Mockito.verify(doctorRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Specification.class));
+            Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
+        }
 
-    @Test
-    void save_ThrowsDuplicateResourceException_WhenSpecialtyServiceReturnDuplicateSpecialties() {
-        Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Clínico Geral", "Descrição");
-        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", false, specialty);
+        @Test
+        void save_ThrowsDuplicateResourceException_WhenSpecialtyServiceReturnDuplicateSpecialties() {
+            Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
+                    .thenReturn(List.of());
+            Mockito.when(specialtyService.findByOptionalFilters(specialtyMock.getName(), null))
+                    .thenReturn(List.of(specialtyMock, specialtyMock));
 
-        Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
-                .thenReturn(List.of());
-        Mockito.when(specialtyService.findByOptionalFilters(specialty.getName(), null))
-                .thenReturn(List.of(specialty, specialty));
+            Assertions.assertThrows(DuplicateResourceException.class, () -> doctorService.save(doctorMock, List.of(specialtyMock.getName())));
+            Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
+        }
 
-        Assertions.assertThrows(DuplicateResourceException.class, () -> doctorService.save(doctorMock, List.of(specialty.getName())));
-        Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
-    }
+        @Test
+        void save_ThrowsResourceNotFoundException_WhenSpecialtyNotExists() {
+            Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
+                    .thenReturn(List.of());
+            Mockito.when(specialtyService.findByOptionalFilters(specialtyMock.getName(), null))
+                    .thenReturn(List.of());
 
-    @Test
-    void save_ThrowsResourceNotFoundException_WhenSpecialtyNotExists() {
-        Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Clínico Geral", "Descrição");
-        Doctor doctorMock = DoctorUtil.createDoctor(1L, "Henrique", "12345", "BA", false, specialty);
-
-        Mockito.when(doctorRepository.findAll(ArgumentMatchers.any(Specification.class)))
-                .thenReturn(List.of());
-        Mockito.when(specialtyService.findByOptionalFilters(specialty.getName(), null))
-                .thenReturn(List.of());
-
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.save(doctorMock, List.of(specialty.getName())));
-        Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
+            Assertions.assertThrows(ResourceNotFoundException.class, () -> doctorService.save(doctorMock, List.of(specialtyMock.getName())));
+            Mockito.verify(doctorRepository, Mockito.never()).save(ArgumentMatchers.any(Doctor.class));
+        }
     }
 
     @Test
