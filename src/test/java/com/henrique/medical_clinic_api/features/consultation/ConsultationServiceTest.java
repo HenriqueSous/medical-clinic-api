@@ -472,10 +472,11 @@ class ConsultationServiceTest {
                 int duration,
                 long id
         ) {
-            Consultation firstConsultationMock = ConsultationUtil.createConsultation(
-                    1L, dateTimeFirstConsultation
-            );
+            Consultation firstConsultationMock = ConsultationUtil.createConsultation(1L);
             Doctor doctor = firstConsultationMock.getDoctor();
+
+            firstConsultationMock.setConsultationDate(dateTimeFirstConsultation.toLocalDate());
+            firstConsultationMock.setConsultationTime(dateTimeFirstConsultation.toLocalTime());
 
             Patient patientForUpdated = PatientUtil.createPatient(2L, "Marcelo", "09876545678");
             Patient patient2 = PatientUtil.createPatient(2L, "Inara", "09876543212");
@@ -519,7 +520,7 @@ class ConsultationServiceTest {
             Consultation consultationToUpdate = ConsultationUtil.createConsultation(
                     2L,
                     patientMock,
-                    DoctorUtil.createDoctor(3L, "Ana", "67584", "BA"),
+                    DoctorUtil.createDoctor(),
                     LocalDateTime.of(2026, 12, 5, 12, 20),
                     30
             );

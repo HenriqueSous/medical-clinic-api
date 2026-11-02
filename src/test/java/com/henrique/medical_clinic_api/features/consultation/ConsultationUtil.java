@@ -31,24 +31,6 @@ public class ConsultationUtil {
         return consultation;
     }
 
-    public static Consultation createConsultation(long id, LocalDateTime dateTime) {
-        Patient patient = PatientUtil.createPatient(1L, "Henrique", "12345678909");
-        Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
-        Doctor doctor = DoctorUtil.createDoctor(1L, "Pedro", "12345", "BA", true, specialty);
-
-        Consultation consultation = new Consultation(
-                id,
-                patient,
-                doctor,
-                dateTime.toLocalDate(),
-                dateTime.toLocalTime(),
-                30,
-                ConsultationStatus.SCHEDULED, LocalDateTime.now(), LocalDateTime.now()
-        );
-
-        return consultation;
-    }
-
     public static Consultation createConsultation(long id, Patient patient, Doctor doctor, LocalDateTime consultationDataTime, int duration) {
         Consultation consultation = new Consultation(id, patient, doctor, consultationDataTime.toLocalDate(), consultationDataTime.toLocalTime(),
                 duration, ConsultationStatus.SCHEDULED, LocalDateTime.now(), LocalDateTime.now());
