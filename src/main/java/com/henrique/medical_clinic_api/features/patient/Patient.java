@@ -1,6 +1,5 @@
 package com.henrique.medical_clinic_api.features.patient;
 
-import com.henrique.medical_clinic_api.features.consultation.Consultation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,8 +9,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "patients")
