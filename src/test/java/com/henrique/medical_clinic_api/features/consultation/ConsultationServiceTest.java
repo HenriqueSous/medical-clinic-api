@@ -7,6 +7,7 @@ import com.henrique.medical_clinic_api.features.patient.Patient;
 import com.henrique.medical_clinic_api.features.patient.PatientService;
 import com.henrique.medical_clinic_api.features.patient.PatientUtil;
 import com.henrique.medical_clinic_api.features.specialty.SpecialtyUtil;
+import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
 import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -229,6 +230,40 @@ class ConsultationServiceTest {
                     LocalDate.of(2026, 9, 24), LocalTime.of(16, 10), 30);
 
             Assertions.assertThrows(DuplicateAppointmentDateException.class, () -> consultationService.save(consultationRequestDTO));
+
+            Mockito.verify(consultationRepository, Mockito.never()).save(ArgumentMatchers.any(Consultation.class));
+        }
+
+        @Test
+        void save_ThrowsProfileStatusInactiveException_WhenDoctorIsInactive() {
+            doctorMock.setStatus(ProfileStatus.INACTIVE);
+
+            Mockito.when(doctorService.findById(1L))
+                    .thenReturn(doctorMock);
+            Mockito.when(patientService.findById(1L))
+                    .thenReturn(patientMock);
+
+            ConsultationRequestDTO consultationRequestDTO = new ConsultationRequestDTO(1L, 1L,
+                    LocalDate.of(2026, 9, 24), LocalTime.of(16, 10), 30);
+
+            Assertions.assertThrows(ProfileStatusInactiveException.class, () -> consultationService.save(consultationRequestDTO));
+
+            Mockito.verify(consultationRepository, Mockito.never()).save(ArgumentMatchers.any(Consultation.class));
+        }
+
+        @Test
+        void save_ThrowsProfileStatusInactiveException_WhenPatientIsInactive() {
+            patientMock.setStatus(ProfileStatus.INACTIVE);
+
+            Mockito.when(doctorService.findById(1L))
+                    .thenReturn(doctorMock);
+            Mockito.when(patientService.findById(1L))
+                    .thenReturn(patientMock);
+
+            ConsultationRequestDTO consultationRequestDTO = new ConsultationRequestDTO(1L, 1L,
+                    LocalDate.of(2026, 9, 24), LocalTime.of(16, 10), 30);
+
+            Assertions.assertThrows(ProfileStatusInactiveException.class, () -> consultationService.save(consultationRequestDTO));
 
             Mockito.verify(consultationRepository, Mockito.never()).save(ArgumentMatchers.any(Consultation.class));
         }
