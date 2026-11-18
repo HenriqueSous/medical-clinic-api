@@ -1,6 +1,7 @@
 package com.henrique.medical_clinic_api.features.doctor;
 
 import com.henrique.medical_clinic_api.features.specialty.Specialty;
+import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +33,9 @@ public class Doctor {
 
     @Column(nullable = false, updatable = false, length = 2)
     private String uf;
+
+    @Enumerated(EnumType.STRING)
+    private ProfileStatus status;
 
     @CreationTimestamp
     @Column(nullable = false)

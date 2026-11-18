@@ -1,5 +1,6 @@
 package com.henrique.medical_clinic_api.features.patient;
 
+import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +27,9 @@ public class Patient {
 
     @Column(nullable = false, unique = true, updatable = false, length = 11)
     private String cpf;
+
+    @Enumerated(EnumType.STRING)
+    private ProfileStatus status;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
