@@ -1,5 +1,6 @@
 package com.henrique.medical_clinic_api.features.patient;
 
+import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
 import com.henrique.medical_clinic_api.shared.exception.DuplicateResourceException;
 import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.shared.exception.BodyEmptyException;
@@ -49,6 +50,10 @@ public class PatientService {
         if (jsonNode.has("name")) {
             String name = jsonNode.get("name").asString();
             patient.setName(name);
+        }
+        if (jsonNode.has("status")) {
+            ProfileStatus status = ProfileStatus.valueOf(jsonNode.get("status").asString().toUpperCase());
+            patient.setStatus(status);
         }
 
         return patientRepository.save(patient);

@@ -1,5 +1,6 @@
 package com.henrique.medical_clinic_api.features.doctor;
 
+import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
 import com.henrique.medical_clinic_api.shared.exception.DuplicateResourceException;
 import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.shared.exception.ImmutableFieldException;
@@ -72,6 +73,10 @@ public class DoctorService {
         if (jsonNode.has("name")) {
             String name = jsonNode.get("name").asString();
             doctor.setName(name);
+        }
+        if (jsonNode.has("status")) {
+            ProfileStatus status = ProfileStatus.valueOf(jsonNode.get("status").asString().toUpperCase());
+            doctor.setStatus(status);
         }
         if (jsonNode.has("specialties")) {
             JsonNode specialties = jsonNode.path("specialties");
