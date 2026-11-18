@@ -2,6 +2,7 @@ package com.henrique.medical_clinic_api.features.consultation;
 
 import com.henrique.medical_clinic_api.features.doctor.DoctorService;
 import com.henrique.medical_clinic_api.features.patient.PatientService;
+import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
 import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.features.doctor.Doctor;
 import com.henrique.medical_clinic_api.features.patient.Patient;
@@ -48,6 +49,8 @@ public class ConsultationService {
         long doctorId = consultationRequestDTO.doctorId();
         Doctor doctor = doctorService.findById(doctorId);
         Patient patient = patientService.findById(patientId);
+
+        checkProfileStatus(doctor, patient);
 
         int duration = checkDuration(consultationRequestDTO.duration());
 
@@ -125,6 +128,15 @@ public class ConsultationService {
         }
 
         return consultationRepository.save(consultation);
+    }
+
+    private void checkProfileStatus(Doctor doctor, Patient patient) {
+        if (doctor.getStatus() == ProfileStatus.INACTIVE) {
+            throw new ProfileStatusInactiveException("Doctor", doctor.getId());
+        }
+        if (patient.getStatus() == ProfileStatus.INACTIVE) {
+            throw new ProfileStatusInactiveException("Patient", patient.getId());
+        }
     }
 
     private void validateAppointment(long patientId, long doctorId, LocalDate date, LocalTime time, int duration, long exceptThisId) {
