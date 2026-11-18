@@ -3,6 +3,7 @@ package com.henrique.medical_clinic_api.features.doctor;
 import com.henrique.medical_clinic_api.features.specialty.Specialty;
 import com.henrique.medical_clinic_api.features.specialty.SpecialtyService;
 import com.henrique.medical_clinic_api.features.specialty.SpecialtyUtil;
+import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
 import com.henrique.medical_clinic_api.shared.exception.DuplicateResourceException;
 import com.henrique.medical_clinic_api.shared.exception.ImmutableFieldException;
 import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
@@ -241,6 +242,9 @@ class DoctorServiceTest {
             ObjectNode jsonNodeRoot = mapper.createObjectNode();
             jsonNodeRoot.put("name", newName);
 
+            ProfileStatus newStatus = ProfileStatus.INACTIVE;
+            jsonNodeRoot.put("status", newStatus.name());
+
             ObjectNode jsonNodeSpe = mapper.createObjectNode();
 
             ArrayNode arrayNodeAdd = mapper.createArrayNode();
@@ -269,6 +273,7 @@ class DoctorServiceTest {
             Assertions.assertEquals(newName, doctorUpdated.getName());
             Assertions.assertEquals(doctorMock.getCrm(), doctorUpdated.getCrm());
             Assertions.assertEquals(doctorMock.getUf(), doctorUpdated.getUf());
+            Assertions.assertEquals(newStatus, doctorUpdated.getStatus());
             Assertions.assertTrue(doctorUpdated.getSpecialties().contains(specialtyNeuro));
             Assertions.assertTrue(doctorUpdated.getSpecialties().contains(specialtyCardio));
             Assertions.assertFalse(doctorUpdated.getSpecialties().contains(specialtyOrto));
@@ -324,7 +329,36 @@ class DoctorServiceTest {
             long doctorId = doctorMock.getId();
 
             ObjectNode jsonNodeRoot = mapper.createObjectNode();
-            jsonNodeRoot.put("name", "Inara");
+            String newName = "Inara";
+            jsonNodeRoot.put("name", newName);
+
+            Mockito.when(doctorRepository.findById(doctorId))
+                    .thenReturn(Optional.of(doctorMock));
+            Mockito.when(doctorRepository.save(ArgumentMatchers.any(Doctor.class)))
+                    .thenAnswer(inv -> inv.getArgument(0));
+
+            Doctor doctorUpdated = doctorService.updateByParts(doctorId, jsonNodeRoot);
+
+            Assertions.assertNotNull(doctorUpdated);
+            Assertions.assertEquals(doctorId, doctorUpdated.getId());
+            Assertions.assertEquals(newName, doctorUpdated.getName());
+            Assertions.assertEquals(doctorMock.getCrm(), doctorUpdated.getCrm());
+            Assertions.assertEquals(doctorMock.getUf(), doctorUpdated.getUf());
+            Assertions.assertEquals(doctorMock.getStatus(), doctorUpdated.getStatus());
+            Assertions.assertTrue(doctorUpdated.getSpecialties().contains(specialtyCardio));
+            Assertions.assertTrue(doctorUpdated.getSpecialties().contains(specialtyOrto));
+            Assertions.assertEquals(2, doctorUpdated.getSpecialties().size());
+
+            Mockito.verify(doctorRepository, Mockito.times(1)).save(ArgumentMatchers.any(Doctor.class));
+        }
+
+        @Test
+        void updateByParts_UpdateOnlyDoctorStatus_WhenOnlyStatusIsProvided() {
+            long doctorId = doctorMock.getId();
+
+            ObjectNode jsonNodeRoot = mapper.createObjectNode();
+            ProfileStatus newStatus = ProfileStatus.INACTIVE;
+            jsonNodeRoot.put("status", newStatus.name());
 
             Mockito.when(doctorRepository.findById(doctorId))
                     .thenReturn(Optional.of(doctorMock));
@@ -338,6 +372,7 @@ class DoctorServiceTest {
             Assertions.assertEquals(doctorMock.getName(), doctorUpdated.getName());
             Assertions.assertEquals(doctorMock.getCrm(), doctorUpdated.getCrm());
             Assertions.assertEquals(doctorMock.getUf(), doctorUpdated.getUf());
+            Assertions.assertEquals(newStatus, doctorUpdated.getStatus());
             Assertions.assertTrue(doctorUpdated.getSpecialties().contains(specialtyCardio));
             Assertions.assertTrue(doctorUpdated.getSpecialties().contains(specialtyOrto));
             Assertions.assertEquals(2, doctorUpdated.getSpecialties().size());

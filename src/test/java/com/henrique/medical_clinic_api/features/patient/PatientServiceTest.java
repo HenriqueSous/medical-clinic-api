@@ -1,5 +1,6 @@
 package com.henrique.medical_clinic_api.features.patient;
 
+import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
 import com.henrique.medical_clinic_api.shared.exception.DuplicateResourceException;
 import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.shared.exception.BodyEmptyException;
@@ -139,6 +140,9 @@ class PatientServiceTest {
             String newName = "Inara";
             jsonNode.put("name", newName);
 
+            ProfileStatus newStatus = ProfileStatus.INACTIVE;
+            jsonNode.put("status", newStatus.name());
+
             Mockito.when(patientRepository.findById(id))
                     .thenReturn(Optional.of(patientMock));
             Mockito.when(patientRepository.save(ArgumentMatchers.any(Patient.class)))
@@ -149,6 +153,53 @@ class PatientServiceTest {
             Assertions.assertNotNull(patientUpdated);
             Assertions.assertEquals(id, patientUpdated.getId());
             Assertions.assertEquals(newName, patientUpdated.getName());
+            Assertions.assertEquals(newStatus, patientUpdated.getStatus());
+            Mockito.verify(patientRepository, Mockito.times(1)).save(ArgumentMatchers.any(Patient.class));
+        }
+
+        @Test
+        void updateByParts_UpdatePatientName_WhenOnlyNameIsProvided() {
+            Patient patientMock = PatientUtil.createPatient();
+            long id = patientMock.getId();
+
+            ObjectNode jsonNode = mapper.createObjectNode();
+            String newName = "Inara";
+            jsonNode.put("name", newName);
+
+            Mockito.when(patientRepository.findById(id))
+                    .thenReturn(Optional.of(patientMock));
+            Mockito.when(patientRepository.save(ArgumentMatchers.any(Patient.class)))
+                    .thenAnswer(inv -> inv.getArgument(0));
+
+            Patient patientUpdated = patientService.updateByParts(id, jsonNode);
+
+            Assertions.assertNotNull(patientUpdated);
+            Assertions.assertEquals(id, patientUpdated.getId());
+            Assertions.assertEquals(newName, patientUpdated.getName());
+            Assertions.assertEquals(patientMock.getStatus(), patientUpdated.getStatus());
+            Mockito.verify(patientRepository, Mockito.times(1)).save(ArgumentMatchers.any(Patient.class));
+        }
+
+        @Test
+        void updateByParts_UpdatePatientStatus_WhenOnlyStatusIsProvided() {
+            Patient patientMock = PatientUtil.createPatient();
+            long id = patientMock.getId();
+
+            ObjectNode jsonNode = mapper.createObjectNode();
+            ProfileStatus newStatus = ProfileStatus.INACTIVE;
+            jsonNode.put("status", newStatus.name());
+
+            Mockito.when(patientRepository.findById(id))
+                    .thenReturn(Optional.of(patientMock));
+            Mockito.when(patientRepository.save(ArgumentMatchers.any(Patient.class)))
+                    .thenAnswer(inv -> inv.getArgument(0));
+
+            Patient patientUpdated = patientService.updateByParts(id, jsonNode);
+
+            Assertions.assertNotNull(patientUpdated);
+            Assertions.assertEquals(id, patientUpdated.getId());
+            Assertions.assertEquals(patientMock.getName(), patientUpdated.getName());
+            Assertions.assertEquals(newStatus, patientUpdated.getStatus());
             Mockito.verify(patientRepository, Mockito.times(1)).save(ArgumentMatchers.any(Patient.class));
         }
 

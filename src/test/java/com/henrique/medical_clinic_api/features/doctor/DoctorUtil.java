@@ -1,6 +1,7 @@
 package com.henrique.medical_clinic_api.features.doctor;
 
 import com.henrique.medical_clinic_api.features.specialty.Specialty;
+import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,11 +10,11 @@ import java.util.List;
 
 public class DoctorUtil {
     public static Doctor createDoctor() {
-        return new Doctor(1L, "Henrique", "57863", "BA", LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>());
+        return new Doctor(1L, "Henrique", "57863", "BA", ProfileStatus.ACTIVE, LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>());
     }
 
     public static Doctor createDoctor(boolean linkSpecialties, Specialty... specialties) {
-        Doctor doctor = new Doctor(1L, "Henrique", "57863", "BA", LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>());
+        Doctor doctor = new Doctor(1L, "Henrique", "57863", "BA", ProfileStatus.ACTIVE, LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>());
 
         if (linkSpecialties) {
             linkDoctorToSpecialties(doctor, specialties);
@@ -25,7 +26,7 @@ public class DoctorUtil {
     }
 
     public static Doctor createDoctor(long id, String name, String crm, String uf, boolean linkSpecialties, Specialty... specialties) {
-        Doctor doctor = new Doctor(id, name, crm, uf, LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>());
+        Doctor doctor = new Doctor(id, name, crm, uf, ProfileStatus.ACTIVE, LocalDateTime.now(), LocalDateTime.now(), new ArrayList<>());
 
         if (linkSpecialties) {
             linkDoctorToSpecialties(doctor, specialties);
