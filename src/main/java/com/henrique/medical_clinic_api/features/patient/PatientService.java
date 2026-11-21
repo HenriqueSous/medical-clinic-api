@@ -11,11 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PatientService {
     @Autowired
     private PatientRepository patientRepository;
+
+    @Autowired
+    private Map<String, PatientDeactivationRule> patientDeactivationRuleMap;
 
     public List<Patient> findAll() {
         return patientRepository.findAll();
@@ -53,6 +57,11 @@ public class PatientService {
         }
         if (jsonNode.has("status")) {
             ProfileStatus status = ProfileStatus.valueOf(jsonNode.get("status").asString().toUpperCase());
+            if (status.equals(ProfileStatus.INACTIVE)) {
+                for (Map.Entry<String, PatientDeactivationRule> entry : patientDeactivationRuleMap.entrySet()) {
+                    entry.getValue().isDeactivationPermitted(id);
+                }
+            }
             patient.setStatus(status);
         }
 
