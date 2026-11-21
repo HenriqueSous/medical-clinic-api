@@ -42,6 +42,13 @@ public class ConsultationSpecifications {
         };
     }
 
+    public static Specification<Consultation> notEqualsConsultationStatus(ConsultationStatus consultationStatus) {
+        return (root, query, criteriaBuilder) -> {
+            if (ObjectUtils.isEmpty(consultationStatus)) return null;
+            return criteriaBuilder.notEqual(root.get("status"), consultationStatus);
+        };
+    }
+
     public static Specification<Consultation> equalsDuration(Integer duration) {
         return (root, query, criteriaBuilder) -> {
             if (ObjectUtils.isEmpty(duration)) return null;

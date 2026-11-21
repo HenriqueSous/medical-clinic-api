@@ -7,6 +7,7 @@ import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundExceptio
 import com.henrique.medical_clinic_api.features.doctor.Doctor;
 import com.henrique.medical_clinic_api.features.patient.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
@@ -39,8 +40,8 @@ public class ConsultationService {
         return consultationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Consultation", id));
     }
 
-    public List<Consultation> find(ConsultationQueryFilter filter) {
-        return consultationRepository.findAll(filter.toSpecification());
+    public List<Consultation> find(Specification<Consultation> specification) {
+        return consultationRepository.findAll(specification);
     }
 
     @Transactional
@@ -159,7 +160,7 @@ public class ConsultationService {
                 .consultationDate(dateTime.toLocalDate())
                 .build();
 
-        for (Consultation consultation : find(filter)) {
+        for (Consultation consultation : find(filter.toSpecification())) {
             LocalDateTime scheduledDateTime = LocalDateTime.of(consultation.getConsultationDate(), consultation.getConsultationTime());
 
             if (exceptThisId != consultation.getId() && consultation.getStatus() != ConsultationStatus.CANCELED) {
@@ -183,7 +184,7 @@ public class ConsultationService {
                 .consultationDate(date)
                 .build();
 
-        ArrayList<Consultation> consultations = new ArrayList<>(find(filterPatientConsultationDate));
+        ArrayList<Consultation> consultations = new ArrayList<>(find(filterPatientConsultationDate.toSpecification()));
         consultations.removeIf(con -> con.getId() == exceptThisId);
 
         if (!consultations.isEmpty()) {
@@ -203,7 +204,7 @@ public class ConsultationService {
     public void cancelOverdueAppointments() {
         LocalDateTime dateTimeMinusOneDay = LocalDateTime.now().minusHours(24);
 
-        for (Consultation consultation : find(ConsultationQueryFilter.builder().build())) {
+        for (Consultation consultation : find(ConsultationQueryFilter.builder().build().toSpecification())) {
             LocalDateTime dateTime = LocalDateTime.of(consultation.getConsultationDate(), consultation.getConsultationTime());
             if (dateTime.isBefore(dateTimeMinusOneDay)) {
                 if (consultation.getStatus().equals(ConsultationStatus.SCHEDULED) || consultation.getStatus().equals(ConsultationStatus.CONFIRMED)) {

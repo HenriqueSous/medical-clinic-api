@@ -1,11 +1,12 @@
 package com.henrique.medical_clinic_api.features.doctor;
 
+import com.henrique.medical_clinic_api.features.specialty.Specialty;
+import com.henrique.medical_clinic_api.features.specialty.SpecialtyService;
 import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
 import com.henrique.medical_clinic_api.shared.exception.DuplicateResourceException;
-import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.shared.exception.ImmutableFieldException;
-import com.henrique.medical_clinic_api.features.specialty.SpecialtyService;
-import com.henrique.medical_clinic_api.features.specialty.Specialty;
+import com.henrique.medical_clinic_api.features.consultation.PendingConsultationsException;
+import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import tools.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class DoctorService {
@@ -21,6 +23,9 @@ public class DoctorService {
 
     @Autowired
     private SpecialtyService specialtyService;
+
+    @Autowired
+    private Map<String, DoctorDeactivationRule> doctorDeactivationRuleMap;
 
     public List<Doctor> find(DoctorQueryFilter doctorQueryFilter) {
         return doctorRepository.findAll(doctorQueryFilter.toSpecification());
@@ -76,6 +81,11 @@ public class DoctorService {
         }
         if (jsonNode.has("status")) {
             ProfileStatus status = ProfileStatus.valueOf(jsonNode.get("status").asString().toUpperCase());
+            if (status.equals(ProfileStatus.INACTIVE)) {
+                for (Map.Entry<String, DoctorDeactivationRule> entry : doctorDeactivationRuleMap.entrySet()) {
+                    entry.getValue().isDeactivationPermitted(id);
+                }
+            }
             doctor.setStatus(status);
         }
         if (jsonNode.has("specialties")) {
