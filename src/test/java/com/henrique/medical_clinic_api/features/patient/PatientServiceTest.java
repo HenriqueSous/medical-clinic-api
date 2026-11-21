@@ -1,10 +1,10 @@
 package com.henrique.medical_clinic_api.features.patient;
 
 import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
-import com.henrique.medical_clinic_api.shared.exception.DuplicateResourceException;
-import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.shared.exception.BodyEmptyException;
+import com.henrique.medical_clinic_api.shared.exception.DuplicateResourceException;
 import com.henrique.medical_clinic_api.shared.exception.ImmutableFieldException;
+import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,12 +19,16 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class PatientServiceTest {
     @Mock
     private PatientRepository patientRepository;
+
+    @Mock
+    private Map<String, PatientDeactivationRule> patientDeactivationRuleMap;
 
     @InjectMocks
     private PatientService patientService;

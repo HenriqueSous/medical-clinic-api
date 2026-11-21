@@ -31,6 +31,24 @@ public class ConsultationUtil {
         return consultation;
     }
 
+    public static Consultation createConsultation(long id, Patient patient) {
+        Specialty specialty = SpecialtyUtil.createSpecialty(1L, "Cardiologista", "Descrição cardiologista");
+        Doctor doctor = DoctorUtil.createDoctor(1L, "Pedro", "12345", "BA", true, specialty);
+
+        Consultation consultation = new Consultation(
+                id,
+                patient,
+                doctor,
+                LocalDate.of(2026, 9, 24),
+                LocalTime.of(15, 30),
+                30,
+                ConsultationStatus.SCHEDULED,
+                LocalDateTime.now(), LocalDateTime.now()
+        );
+
+        return consultation;
+    }
+
     public static Consultation createConsultation(long id, Doctor doctor) {
         Patient patient = PatientUtil.createPatient(1L, "Henrique", "12345678909");
 
