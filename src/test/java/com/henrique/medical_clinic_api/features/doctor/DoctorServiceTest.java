@@ -20,6 +20,7 @@ import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +30,9 @@ class DoctorServiceTest {
 
     @Mock
     private SpecialtyService specialtyService;
+
+    @Mock
+    private Map<String, DoctorDeactivationRule> doctorDeactivationRuleMap;
 
     @InjectMocks
     private DoctorService doctorService;
