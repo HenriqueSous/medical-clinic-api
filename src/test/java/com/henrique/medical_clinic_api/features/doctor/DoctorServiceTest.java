@@ -3,6 +3,7 @@ package com.henrique.medical_clinic_api.features.doctor;
 import com.henrique.medical_clinic_api.features.specialty.Specialty;
 import com.henrique.medical_clinic_api.features.specialty.SpecialtyService;
 import com.henrique.medical_clinic_api.features.specialty.SpecialtyUtil;
+import com.henrique.medical_clinic_api.shared.domain.ProfileDeactivationRule;
 import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
 import com.henrique.medical_clinic_api.shared.exception.DuplicateResourceException;
 import com.henrique.medical_clinic_api.shared.exception.ImmutableFieldException;
@@ -32,7 +33,7 @@ class DoctorServiceTest {
     private SpecialtyService specialtyService;
 
     @Mock
-    private Map<String, DoctorDeactivationRule> doctorDeactivationRuleMap;
+    private Map<String, ProfileDeactivationRule> profileDeactivationRuleMap;
 
     @InjectMocks
     private DoctorService doctorService;

@@ -1,5 +1,6 @@
 package com.henrique.medical_clinic_api.features.patient;
 
+import com.henrique.medical_clinic_api.shared.domain.ProfileDeactivationRule;
 import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
 import com.henrique.medical_clinic_api.shared.exception.BodyEmptyException;
 import com.henrique.medical_clinic_api.shared.exception.DuplicateResourceException;
@@ -28,7 +29,7 @@ class PatientServiceTest {
     private PatientRepository patientRepository;
 
     @Mock
-    private Map<String, PatientDeactivationRule> patientDeactivationRuleMap;
+    private Map<String, ProfileDeactivationRule> profileDeactivationRuleMap;
 
     @InjectMocks
     private PatientService patientService;

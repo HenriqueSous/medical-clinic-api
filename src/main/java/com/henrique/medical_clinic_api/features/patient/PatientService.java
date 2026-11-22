@@ -1,10 +1,11 @@
 package com.henrique.medical_clinic_api.features.patient;
 
+import com.henrique.medical_clinic_api.shared.domain.ProfileDeactivationRule;
 import com.henrique.medical_clinic_api.shared.domain.ProfileStatus;
-import com.henrique.medical_clinic_api.shared.exception.DuplicateResourceException;
-import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import com.henrique.medical_clinic_api.shared.exception.BodyEmptyException;
+import com.henrique.medical_clinic_api.shared.exception.DuplicateResourceException;
 import com.henrique.medical_clinic_api.shared.exception.ImmutableFieldException;
+import com.henrique.medical_clinic_api.shared.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ public class PatientService {
     private PatientRepository patientRepository;
 
     @Autowired
-    private Map<String, PatientDeactivationRule> patientDeactivationRuleMap;
+    private Map<String, ProfileDeactivationRule> profileDeactivationRuleMap;
 
     public List<Patient> findAll() {
         return patientRepository.findAll();
@@ -58,8 +59,8 @@ public class PatientService {
         if (jsonNode.has("status")) {
             ProfileStatus status = ProfileStatus.valueOf(jsonNode.get("status").asString().toUpperCase());
             if (status.equals(ProfileStatus.INACTIVE)) {
-                for (Map.Entry<String, PatientDeactivationRule> entry : patientDeactivationRuleMap.entrySet()) {
-                    entry.getValue().isDeactivationPermitted(id);
+                for (Map.Entry<String, ProfileDeactivationRule> entry : profileDeactivationRuleMap.entrySet()) {
+                    entry.getValue().isPatientDeactivationPermitted(id);
                 }
             }
             patient.setStatus(status);
