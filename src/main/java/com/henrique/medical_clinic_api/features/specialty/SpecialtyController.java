@@ -26,7 +26,9 @@ public class SpecialtyController {
     @PostMapping
     private ResponseEntity<SpecialtyResponseDTO> post(@Valid @RequestBody SpecialtyRequestDTO specialtyRequestDtO) {
         Specialty specialty = specialtyMapper.toEntity(specialtyRequestDtO);
-        return ResponseEntity.ok(specialtyMapper.toResponse(specialtyService.save(specialty)));
+        SpecialtyResponseDTO response = specialtyMapper.toResponse(specialtyService.save(specialty));
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping
